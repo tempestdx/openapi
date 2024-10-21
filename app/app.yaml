@@ -1,0 +1,582 @@
+openapi: 3.0.3
+info:
+  title: Private Apps API
+  version: "1.0.0"
+  description: API for Private Apps to connect to Tempest.
+servers:
+  - url: https://developer.tempestdx.com/api/v1
+    description: Production server
+paths:
+  /apps.operations.next:
+    post:
+      summary: Retrieve the next task to execute
+      description: Fetch the next available task for execution by an external client.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppRequest"
+      responses:
+        "200":
+          description: The next task to execute
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NextResponse"
+        "204":
+          description: No tasks available
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /apps.operations.report:
+    post:
+      summary: Report the result of a task execution
+      description: Clients report task completion or failure using this endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReportResponse"
+      responses:
+        "200":
+          description: Task report received successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Task not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /apps.version.connect:
+    post:
+      summary: Connect to a specific app version
+      description: Establish a connection with a specific version of an app, defining the resource types.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                app_id:
+                  type: string
+                  description: The unique identifier of the application.
+                version:
+                  type: string
+                  description: The version of the application.
+                resources:
+                  type: array
+                  items:
+                    $ref: "#/components/schemas/ResourceDefinition"
+              required:
+                - app_id
+                - version
+                - resources
+      responses:
+        "200":
+          description: Successfully connected to the app version.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /apps.versions.health:
+    post:
+      summary: Handles health check reports for apps
+      description: Clients report health check results using this endpoint.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AppHealthReportRequest"
+      responses:
+        "200":
+          description: Received health check report
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StandardResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+components:
+  securitySchemes:
+    Tempest Token:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    AppHealthReportRequest:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The unique identifier of the application.
+        version:
+          type: string
+          description: The version of the application.
+        health_reports:
+          type: array
+          items:
+            $ref: "#/components/schemas/AppHealthReportItem"
+          description: Health check reports for the application.
+      required:
+        - app_id
+        - version
+        - health_reports
+
+    AppHealthReportItem:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The resource type being reported.
+        status:
+          type: string
+          enum: [healthy, degraded, disrupted]
+          description: The status of the health check.
+        message:
+          type: string
+          description: A message providing additional information.
+      required:
+        - type
+        - status
+
+    AppRequest:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The unique identifier of the application.
+        version:
+          type: string
+          description: The version of the application.
+      required:
+        - app_id
+        - version
+
+    NextResponse:
+      type: object
+      properties:
+        task:
+          oneOf:
+            - $ref: "#/components/schemas/ExecuteResourceOperationRequest"
+            - $ref: "#/components/schemas/ExecuteResourceActionRequest"
+            - $ref: "#/components/schemas/ListResourcesRequest"
+          discriminator:
+            propertyName: request_type
+            mapping:
+              execute_resource_operation: "#/components/schemas/ExecuteResourceOperationRequest"
+              execute_resource_action: "#/components/schemas/ExecuteResourceActionRequest"
+              list_resources: "#/components/schemas/ListResourcesRequest"
+        task_id:
+          type: string
+          description: The unique identifier of the task.
+        metadata:
+          $ref: "#/components/schemas/TaskMetadata"
+      required:
+        - task
+        - task_id
+        - metadata
+
+    TaskMetadata:
+      type: object
+      properties:
+        owners:
+          type: array
+          items:
+            $ref: "#/components/schemas/Owner"
+          description: The owners of the task.
+        author:
+          $ref: "#/components/schemas/Owner"
+          description: The author of the task.
+        project_id:
+          type: string
+          description: The unique identifier of the project.
+        project_name:
+          type: string
+          description: The name of the project.
+      required:
+        - owners
+        - author
+        - project_id
+        - project_name
+
+    Owner:
+      type: object
+      properties:
+        email:
+          type: string
+          description: The email address of the owner.
+        name:
+          type: string
+          description: The name of the owner.
+        type:
+          type: string
+          description: The type of owner.
+          enum: [user, team]
+      required:
+        - email
+        - name
+        - type
+
+    ReportResponse:
+      type: object
+      properties:
+        response:
+          oneOf:
+            - $ref: "#/components/schemas/ExecuteResourceOperationResponse"
+            - $ref: "#/components/schemas/ExecuteResourceActionResponse"
+            - $ref: "#/components/schemas/ListResourcesResponse"
+          discriminator:
+            propertyName: response_type
+            mapping:
+              execute_resource_operation: "#/components/schemas/ExecuteResourceOperationResponse"
+              execute_resource_action: "#/components/schemas/ExecuteResourceActionResponse"
+              list_resources: "#/components/schemas/ListResourcesResponse"
+        task_id:
+          type: string
+          description: The unique identifier of the task.
+        status:
+          type: string
+          enum: [ok, error]
+          description: Status of the report operation
+        message:
+          type: string
+          description: A message providing additional information.
+      required:
+        - response
+        - task_id
+        - status
+
+    ExecuteResourceOperationRequest:
+      type: object
+      properties:
+        request_type:
+          type: string
+          description: The type of request.
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: The resource to operate on.
+        operation:
+          type: string
+          enum: [create, update, delete, read]
+          description: The operation to perform on the resource.
+        input:
+          type: object
+          description: The input parameters for the operation.
+        metadata:
+          type: object
+          description: Metadata associated with the resource operation.
+      required:
+        - request_type
+        - resource
+        - operation
+
+    ExecuteResourceOperationResponse:
+      type: object
+      properties:
+        response_type:
+          type: string
+          description: The type of response.
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: The resource that was operated on.
+      required:
+        - response_type
+        - resources
+
+    ListResourcesRequest:
+      type: object
+      properties:
+        request_type:
+          type: string
+          description: The type of request.
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: The resource to list.
+        metadata:
+          type: object
+          description: Metadata associated with the resource operation.
+        next:
+          type: string
+          description: The next page token for pagination.
+      required:
+        - request_type
+        - resource
+        - next
+
+    ListResourcesResponse:
+      type: object
+      properties:
+        response_type:
+          type: string
+          description: The type of response.
+        resources:
+          type: array
+          items:
+            $ref: "#/components/schemas/Resource"
+          description: The resources that were listed.
+        next:
+          type: string
+          description: The next page token for pagination.
+      required:
+        - response_type
+        - resources
+        - next
+
+    ExecuteResourceActionRequest:
+      type: object
+      properties:
+        request_type:
+          type: string
+          description: The type of request.
+        metadata:
+          type: object
+          description: Metadata associated with the resource operation.
+        resource:
+          $ref: "#/components/schemas/Resource"
+          description: The resource to operate on.
+        action:
+          type: string
+          description: The action to perform on the resource.
+        input:
+          type: object
+          description: The input parameters for the operation.
+      required:
+        - request_type
+        - resource
+        - action
+
+    ExecuteResourceActionResponse:
+      type: object
+      properties:
+        response_type:
+          type: string
+          description: The type of response.
+        output:
+          type: object
+          description: The output of the action.
+      required:
+        - response_type
+        - output
+
+    Resource:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The unique type of the resource.
+        external_id:
+          type: string
+          description: The external identifier of the resource.
+        display_name:
+          type: string
+          description: The display name of the resource.
+        links:
+          $ref: "#/components/schemas/Links"
+        properties:
+          type: object
+          description: Properties of the resource.
+      required:
+        - type
+        - external_id
+        - display_name
+
+    ResourceDefinition:
+      type: object
+      properties:
+        type:
+          type: string
+          description: The type of the resource.
+        display_name:
+          type: string
+          description: The display name of the resource.
+        description:
+          type: string
+          description: A description of the resource.
+        property_json_schema:
+          type: object
+          description: JSON schema defining properties of the resource.
+        list_supported:
+          type: boolean
+          description: Whether the resource supports the list operation.
+        read_supported:
+          type: boolean
+          description: Whether the resource supports the read operation.
+        create_supported:
+          type: boolean
+          description: Whether the resource supports the create operation.
+        create_input_schema:
+          type: object
+          description: JSON schema that defines the input for the create operation.
+        update_supported:
+          type: boolean
+          description: Whether the resource supports the update operation.
+        update_input_schema:
+          type: object
+          description: JSON schema that defines the input for the update operation.
+        delete_supported:
+          type: boolean
+          description: Whether the resource supports the delete operation.
+        healthcheck_supported:
+          type: boolean
+          description: Whether the resource supports health checks.
+        links:
+          $ref: "#/components/schemas/Links"
+        instructions_markdown:
+          type: string
+          description: Markdown instructions for the resource.
+        lifecycle_stage:
+          type: string
+          description: The lifecycle stage of this resource.
+        actions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ActionDefinition"
+          description: Actions that can be performed on this resource.
+      required:
+        - type
+        - display_name
+        - description
+        - list_supported
+        - read_supported
+        - create_supported
+        - update_supported
+        - delete_supported
+        - healthcheck_supported
+        - lifecycle_stage
+
+    ActionDefinition:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The unique name of the action.
+        display_name:
+          type: string
+          description: The display name of the action.
+        description:
+          type: string
+          description: A description of the action.
+        input_json_schema:
+          type: object
+          description: JSON schema defining the input for the action.
+        output_json_schema:
+          type: object
+          description: JSON schema defining the output for the action.
+
+    Metadata:
+      type: object
+      properties:
+        tempest_app_url:
+          type: string
+          description: URL of the app in the Tempest web interface.
+
+    StandardResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [ok, error]
+          description: Status of the report operation
+        message:
+          type: string
+          description: A message providing additional information.
+        metadata:
+          $ref: "#/components/schemas/Metadata"
+        error:
+          type: string
+          nullable: true
+          description: Error message if the operation fails.
+      required:
+        - status
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: [error]
+          description: Always "error" for this schema.
+        error:
+          type: string
+          description: Error message detailing the failure.
+      required:
+        - status
+        - error
+
+    Links:
+      type: object
+      properties:
+        links:
+          type: array
+          items:
+            $ref: "#/components/schemas/LinksItem"
+
+    LinksItem:
+      type: object
+      properties:
+        title:
+          type: string
+          description: The title of the link.
+        url:
+          type: string
+          format: uri
+          description: The URL of the link
+        type:
+          type: string
+          description: The type of link.
+          enum: [documentation, administration, support, endpoint, external]
+      required:
+        - title
+        - url
+        - type
+security:
+  - Tempest Token: []
