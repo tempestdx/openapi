@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	TempestTokenScopes = "TempestToken.Scopes"
+	TokenScopes = "Token.Scopes"
 )
 
 // Defines values for AppHealthReportItemStatus.
@@ -1448,7 +1448,7 @@ func (siw *ServerInterfaceWrapper) PostAppsOperationsNext(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -1468,7 +1468,7 @@ func (siw *ServerInterfaceWrapper) PostAppsOperationsReport(w http.ResponseWrite
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -1488,7 +1488,7 @@ func (siw *ServerInterfaceWrapper) PostAppsVersionConnect(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -1508,7 +1508,7 @@ func (siw *ServerInterfaceWrapper) PostAppsVersionsHealth(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 

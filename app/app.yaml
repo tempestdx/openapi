@@ -159,7 +159,7 @@ paths:
 
 components:
   securitySchemes:
-    TempestToken:
+    Token:
       type: http
       scheme: bearer
       bearerFormat: JWT
@@ -592,4 +592,4 @@ components:
         - url
         - type
 security:
-  - TempestToken: []
+  - Token: []
