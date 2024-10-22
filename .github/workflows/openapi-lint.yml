@@ -1,0 +1,15 @@
+name: Lint OpenAPI Specs
+
+on:
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  openapi-lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Lint OpenAPI specs
+        uses: docker://redocly/cli:latest
+        with:
+          args: lint --format github-actions app/app.yaml
