@@ -10,4 +10,4 @@ jobs:
       - name: Lint OpenAPI specs
         uses: docker://redocly/cli:latest
         with:
-          args: -lint --format github-actions
+          args: lint --format github-actions app/app.yaml
