@@ -6,9 +6,11 @@ on:
   pull_request:
     branches: [ "main" ]
 
-jobs:
+permissions:
+  contents: read
 
-  build:
+jobs:
+  go-test:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -19,4 +21,4 @@ jobs:
     - name: Test
       run: go test -v -race ./...
     - name: Check Go generate
-      run: set -ue; go generate ./...; git diff --quiet || { echo "run go generate ./..."; exit 1; }
+      run: set -ue; go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=app/config.yaml app/app.yaml; git diff --quiet || { echo "run 'go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=app/config.yaml app/app.yaml'"; exit 1; }

@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	Tempest_TokenScopes = "Tempest_Token.Scopes"
+	TempestTokenScopes = "TempestToken.Scopes"
 )
 
 // Defines values for AppHealthReportItemStatus.
@@ -1062,6 +1062,7 @@ type PostAppsOperationsNextResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
 	JSON200      *NextResponse
+	JSON400      *ErrorResponse
 	JSON500      *ErrorResponse
 }
 
@@ -1242,6 +1243,13 @@ func ParsePostAppsOperationsNextResponse(rsp *http.Response) (*PostAppsOperation
 			return nil, err
 		}
 		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
 
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
 		var dest ErrorResponse
@@ -1440,7 +1448,7 @@ func (siw *ServerInterfaceWrapper) PostAppsOperationsNext(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, Tempest_TokenScopes, []string{})
+	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -1460,7 +1468,7 @@ func (siw *ServerInterfaceWrapper) PostAppsOperationsReport(w http.ResponseWrite
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, Tempest_TokenScopes, []string{})
+	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -1480,7 +1488,7 @@ func (siw *ServerInterfaceWrapper) PostAppsVersionConnect(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, Tempest_TokenScopes, []string{})
+	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -1500,7 +1508,7 @@ func (siw *ServerInterfaceWrapper) PostAppsVersionsHealth(w http.ResponseWriter,
 
 	ctx := r.Context()
 
-	ctx = context.WithValue(ctx, Tempest_TokenScopes, []string{})
+	ctx = context.WithValue(ctx, TempestTokenScopes, []string{})
 
 	r = r.WithContext(ctx)
 
@@ -1667,6 +1675,15 @@ type PostAppsOperationsNext204Response struct {
 func (response PostAppsOperationsNext204Response) VisitPostAppsOperationsNextResponse(w http.ResponseWriter) error {
 	w.WriteHeader(204)
 	return nil
+}
+
+type PostAppsOperationsNext400JSONResponse ErrorResponse
+
+func (response PostAppsOperationsNext400JSONResponse) VisitPostAppsOperationsNextResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
 }
 
 type PostAppsOperationsNext500JSONResponse ErrorResponse

@@ -1,5 +1,8 @@
 openapi: 3.0.3
 info:
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
   title: Private Apps API
   version: "1.0.0"
   description: API for Private Apps to connect to Tempest.
@@ -9,6 +12,7 @@ servers:
 paths:
   /apps.operations.next:
     post:
+      operationId: postAppsOperationsNext
       summary: Retrieve the next task to execute
       description: Fetch the next available task for execution by an external client.
       requestBody:
@@ -26,6 +30,12 @@ paths:
                 $ref: "#/components/schemas/NextResponse"
         "204":
           description: No tasks available
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
         "500":
           description: Internal server error
           content:
@@ -35,6 +45,7 @@ paths:
 
   /apps.operations.report:
     post:
+      operationId: postAppsOperationsReport
       summary: Report the result of a task execution
       description: Clients report task completion or failure using this endpoint.
       requestBody:
@@ -71,6 +82,7 @@ paths:
 
   /apps.version.connect:
     post:
+      operationId: postAppsVersionConnect
       summary: Connect to a specific app version
       description: Establish a connection with a specific version of an app, defining the resource types.
       requestBody:
@@ -116,6 +128,7 @@ paths:
 
   /apps.versions.health:
     post:
+      operationId: postAppsVersionsHealth
       summary: Handles health check reports for apps
       description: Clients report health check results using this endpoint.
       requestBody:
@@ -146,7 +159,7 @@ paths:
 
 components:
   securitySchemes:
-    Tempest Token:
+    TempestToken:
       type: http
       scheme: bearer
       bearerFormat: JWT
@@ -579,4 +592,4 @@ components:
         - url
         - type
 security:
-  - Tempest Token: []
+  - TempestToken: []
