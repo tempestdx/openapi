@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: nwestfall/openapi-action@v1.0.2
+      - name: Lint OpenAPI specs
+        uses: docker://redocly/cli:latest
         with:
-          file: app/app.yaml
+          args: -lint --format github-actions
