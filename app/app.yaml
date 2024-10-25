@@ -324,6 +324,11 @@ components:
         input:
           type: object
           description: The input parameters for the operation.
+        environment_variables:
+          type: array
+          description: The environment variables for the operation.
+          items:
+            $ref: "#/components/schemas/EnvironmentVariable"
         metadata:
           type: object
           description: Metadata associated with the resource operation.
@@ -402,6 +407,11 @@ components:
         input:
           type: object
           description: The input parameters for the operation.
+        environment_variables:
+          type: array
+          description: The environment variables for the operation.
+          items:
+            $ref: "#/components/schemas/EnvironmentVariable"
       required:
         - request_type
         - resource
@@ -419,6 +429,24 @@ components:
       required:
         - response_type
         - output
+
+    EnvironmentVariable:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the environment variable.
+        value:
+          type: string
+          description: The value of the environment variable.
+        type:
+          type: string
+          description: The type of environment variable.
+          enum: [variable, secret, certificate, private_key, public_key]
+      required:
+        - name
+        - value
+        - type
 
     Resource:
       type: object

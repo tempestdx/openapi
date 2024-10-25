@@ -30,6 +30,15 @@ const (
 	Healthy   AppHealthReportItemStatus = "healthy"
 )
 
+// Defines values for EnvironmentVariableType.
+const (
+	Certificate EnvironmentVariableType = "certificate"
+	PrivateKey  EnvironmentVariableType = "private_key"
+	PublicKey   EnvironmentVariableType = "public_key"
+	Secret      EnvironmentVariableType = "secret"
+	Variable    EnvironmentVariableType = "variable"
+)
+
 // Defines values for ErrorResponseStatus.
 const (
 	ErrorResponseStatusError ErrorResponseStatus = "error"
@@ -124,6 +133,21 @@ type AppRequest struct {
 	Version string `json:"version"`
 }
 
+// EnvironmentVariable defines model for EnvironmentVariable.
+type EnvironmentVariable struct {
+	// Name The name of the environment variable.
+	Name string `json:"name"`
+
+	// Type The type of environment variable.
+	Type EnvironmentVariableType `json:"type"`
+
+	// Value The value of the environment variable.
+	Value string `json:"value"`
+}
+
+// EnvironmentVariableType The type of environment variable.
+type EnvironmentVariableType string
+
 // ErrorResponse defines model for ErrorResponse.
 type ErrorResponse struct {
 	// Error Error message detailing the failure.
@@ -140,6 +164,9 @@ type ErrorResponseStatus string
 type ExecuteResourceActionRequest struct {
 	// Action The action to perform on the resource.
 	Action string `json:"action"`
+
+	// EnvironmentVariables The environment variables for the operation.
+	EnvironmentVariables *[]EnvironmentVariable `json:"environment_variables,omitempty"`
 
 	// Input The input parameters for the operation.
 	Input *map[string]interface{} `json:"input,omitempty"`
@@ -163,6 +190,9 @@ type ExecuteResourceActionResponse struct {
 
 // ExecuteResourceOperationRequest defines model for ExecuteResourceOperationRequest.
 type ExecuteResourceOperationRequest struct {
+	// EnvironmentVariables The environment variables for the operation.
+	EnvironmentVariables *[]EnvironmentVariable `json:"environment_variables,omitempty"`
+
 	// Input The input parameters for the operation.
 	Input *map[string]interface{} `json:"input,omitempty"`
 
