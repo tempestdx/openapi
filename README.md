@@ -7,8 +7,9 @@ This repository contains OpenAPI specifications for [Tempest][tempest] API.
 
 ## Tempest API
 
-A simple yet powerful way for developers to extend Tempest’s critical
-functionality, starting with Private Apps.
+Unlock Tempest's full potential with our flexible API, enabling seamless
+integration, custom workflows, automation, and adaptability across any tech
+stack in any language.
 
 ## Generating Go code:
 
@@ -20,7 +21,8 @@ go run github.com/oapi-codegen/oapi-codegen/v2/cmd/oapi-codegen --config=app/con
 
 ## Documentation
 
-For details on all the functionality, see our [API documentation][openapi-docs].
+For details on all of the functionality, see our
+[API documentation][openapi-docs].
 
 To share any requests, bugs or comments, please [open an issue][issues] or
 [submit a pull request][pulls].
