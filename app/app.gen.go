@@ -73,10 +73,16 @@ const (
 	ReportResponseStatusOk    ReportResponseStatus = "ok"
 )
 
+// Defines values for ResourceResponseStatus.
+const (
+	ResourceResponseStatusError ResourceResponseStatus = "error"
+	ResourceResponseStatusOk    ResourceResponseStatus = "ok"
+)
+
 // Defines values for StandardResponseStatus.
 const (
-	Error StandardResponseStatus = "error"
-	Ok    StandardResponseStatus = "ok"
+	StandardResponseStatusError StandardResponseStatus = "error"
+	StandardResponseStatusOk    StandardResponseStatus = "ok"
 )
 
 // ActionDefinition defines model for ActionDefinition.
@@ -384,6 +390,24 @@ type ResourceDefinition struct {
 	UpdateSupported bool `json:"update_supported"`
 }
 
+// ResourceResponse defines model for ResourceResponse.
+type ResourceResponse struct {
+	Data Resource `json:"data"`
+
+	// Error Error message if the operation fails.
+	Error *string `json:"error"`
+
+	// Message A message providing additional information.
+	Message  *string   `json:"message,omitempty"`
+	Metadata *Metadata `json:"metadata,omitempty"`
+
+	// Status Status of the report operation
+	Status ResourceResponseStatus `json:"status"`
+}
+
+// ResourceResponseStatus Status of the report operation
+type ResourceResponseStatus string
+
 // StandardResponse defines model for StandardResponse.
 type StandardResponse struct {
 	// Error Error message if the operation fails.
@@ -435,6 +459,9 @@ type PostAppsVersionConnectJSONRequestBody PostAppsVersionConnectJSONBody
 
 // PostAppsVersionsHealthJSONRequestBody defines body for PostAppsVersionsHealth for application/json ContentType.
 type PostAppsVersionsHealthJSONRequestBody = AppHealthReportRequest
+
+// GetResourcesJSONRequestBody defines body for GetResources for application/json ContentType.
+type GetResourcesJSONRequestBody = Resource
 
 // AsExecuteResourceOperationRequest returns the union data inside the NextResponse_Task as a ExecuteResourceOperationRequest
 func (t NextResponse_Task) AsExecuteResourceOperationRequest() (ExecuteResourceOperationRequest, error) {
@@ -766,6 +793,11 @@ type ClientInterface interface {
 	PostAppsVersionsHealthWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PostAppsVersionsHealth(ctx context.Context, body PostAppsVersionsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// GetResourcesWithBody request with any body
+	GetResourcesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	GetResources(ctx context.Context, body GetResourcesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) PostAppsOperationsNextWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -854,6 +886,30 @@ func (c *Client) PostAppsVersionsHealthWithBody(ctx context.Context, contentType
 
 func (c *Client) PostAppsVersionsHealth(ctx context.Context, body PostAppsVersionsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostAppsVersionsHealthRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetResourcesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetResourcesRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) GetResources(ctx context.Context, body GetResourcesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewGetResourcesRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1024,6 +1080,46 @@ func NewPostAppsVersionsHealthRequestWithBody(server string, contentType string,
 	return req, nil
 }
 
+// NewGetResourcesRequest calls the generic GetResources builder with application/json body
+func NewGetResourcesRequest(server string, body GetResourcesJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewGetResourcesRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewGetResourcesRequestWithBody generates requests for GetResources with any type of body
+func NewGetResourcesRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/resources.get")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -1086,6 +1182,11 @@ type ClientWithResponsesInterface interface {
 	PostAppsVersionsHealthWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostAppsVersionsHealthResponse, error)
 
 	PostAppsVersionsHealthWithResponse(ctx context.Context, body PostAppsVersionsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*PostAppsVersionsHealthResponse, error)
+
+	// GetResourcesWithBodyWithResponse request with any body
+	GetResourcesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetResourcesResponse, error)
+
+	GetResourcesWithResponse(ctx context.Context, body GetResourcesJSONRequestBody, reqEditors ...RequestEditorFn) (*GetResourcesResponse, error)
 }
 
 type PostAppsOperationsNextResponse struct {
@@ -1185,6 +1286,31 @@ func (r PostAppsVersionsHealthResponse) StatusCode() int {
 	return 0
 }
 
+type GetResourcesResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ResourceResponse
+	JSON400      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r GetResourcesResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r GetResourcesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // PostAppsOperationsNextWithBodyWithResponse request with arbitrary body returning *PostAppsOperationsNextResponse
 func (c *ClientWithResponses) PostAppsOperationsNextWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostAppsOperationsNextResponse, error) {
 	rsp, err := c.PostAppsOperationsNextWithBody(ctx, contentType, body, reqEditors...)
@@ -1251,6 +1377,23 @@ func (c *ClientWithResponses) PostAppsVersionsHealthWithResponse(ctx context.Con
 		return nil, err
 	}
 	return ParsePostAppsVersionsHealthResponse(rsp)
+}
+
+// GetResourcesWithBodyWithResponse request with arbitrary body returning *GetResourcesResponse
+func (c *ClientWithResponses) GetResourcesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetResourcesResponse, error) {
+	rsp, err := c.GetResourcesWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetResourcesResponse(rsp)
+}
+
+func (c *ClientWithResponses) GetResourcesWithResponse(ctx context.Context, body GetResourcesJSONRequestBody, reqEditors ...RequestEditorFn) (*GetResourcesResponse, error) {
+	rsp, err := c.GetResources(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseGetResourcesResponse(rsp)
 }
 
 // ParsePostAppsOperationsNextResponse parses an HTTP response from a PostAppsOperationsNextWithResponse call
@@ -1420,6 +1563,53 @@ func ParsePostAppsVersionsHealthResponse(rsp *http.Response) (*PostAppsVersionsH
 	return response, nil
 }
 
+// ParseGetResourcesResponse parses an HTTP response from a GetResourcesWithResponse call
+func ParseGetResourcesResponse(rsp *http.Response) (*GetResourcesResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &GetResourcesResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ResourceResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Retrieve the next task to execute
@@ -1434,6 +1624,9 @@ type ServerInterface interface {
 	// Handles health check reports for apps
 	// (POST /apps.versions.health)
 	PostAppsVersionsHealth(w http.ResponseWriter, r *http.Request)
+	// Get details of a resource
+	// (POST /resources.get)
+	GetResources(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -1461,6 +1654,12 @@ func (_ Unimplemented) PostAppsVersionConnect(w http.ResponseWriter, r *http.Req
 // Handles health check reports for apps
 // (POST /apps.versions.health)
 func (_ Unimplemented) PostAppsVersionsHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get details of a resource
+// (POST /resources.get)
+func (_ Unimplemented) GetResources(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1544,6 +1743,26 @@ func (siw *ServerInterfaceWrapper) PostAppsVersionsHealth(w http.ResponseWriter,
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostAppsVersionsHealth(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// GetResources operation middleware
+func (siw *ServerInterfaceWrapper) GetResources(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetResources(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1677,6 +1896,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/apps.versions.health", wrapper.PostAppsVersionsHealth)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/resources.get", wrapper.GetResources)
 	})
 
 	return r
@@ -1839,6 +2061,50 @@ func (response PostAppsVersionsHealth500JSONResponse) VisitPostAppsVersionsHealt
 	return json.NewEncoder(w).Encode(response)
 }
 
+type GetResourcesRequestObject struct {
+	Body *GetResourcesJSONRequestBody
+}
+
+type GetResourcesResponseObject interface {
+	VisitGetResourcesResponse(w http.ResponseWriter) error
+}
+
+type GetResources200JSONResponse ResourceResponse
+
+func (response GetResources200JSONResponse) VisitGetResourcesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetResources400JSONResponse ErrorResponse
+
+func (response GetResources400JSONResponse) VisitGetResourcesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetResources404JSONResponse ErrorResponse
+
+func (response GetResources404JSONResponse) VisitGetResourcesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type GetResources500JSONResponse ErrorResponse
+
+func (response GetResources500JSONResponse) VisitGetResourcesResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// Retrieve the next task to execute
@@ -1853,6 +2119,9 @@ type StrictServerInterface interface {
 	// Handles health check reports for apps
 	// (POST /apps.versions.health)
 	PostAppsVersionsHealth(ctx context.Context, request PostAppsVersionsHealthRequestObject) (PostAppsVersionsHealthResponseObject, error)
+	// Get details of a resource
+	// (POST /resources.get)
+	GetResources(ctx context.Context, request GetResourcesRequestObject) (GetResourcesResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -2001,6 +2270,37 @@ func (sh *strictHandler) PostAppsVersionsHealth(w http.ResponseWriter, r *http.R
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(PostAppsVersionsHealthResponseObject); ok {
 		if err := validResponse.VisitPostAppsVersionsHealthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// GetResources operation middleware
+func (sh *strictHandler) GetResources(w http.ResponseWriter, r *http.Request) {
+	var request GetResourcesRequestObject
+
+	var body GetResourcesJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.GetResources(ctx, request.(GetResourcesRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "GetResources")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(GetResourcesResponseObject); ok {
+		if err := validResponse.VisitGetResourcesResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
