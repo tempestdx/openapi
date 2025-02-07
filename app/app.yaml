@@ -173,7 +173,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/ResourceResponse"
+                $ref: "#/components/schemas/Resource"
         "400":
           description: Invalid request
           content:
@@ -192,6 +192,37 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /resources.list:
+    post:
+      operationId: resourceCollection
+      summary: List resources of a specific type
+      description: Retrieve a list of resources filtered by type.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ListResourcesRequest"
+      responses:
+        "200":
+          description: Resources retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListResourcesResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     Token:
@@ -486,24 +517,65 @@ components:
     Resource:
       type: object
       properties:
-        type:
+        id:
           type: string
-          description: The unique type of the resource.
-        external_id:
+          description: Internal identifier of the resource.
+        createdAt:
           type: string
-          description: The external identifier of the resource.
-        display_name:
+          format: date-time
+          description: Timestamp when the resource was created.
+        createdBy:
+          type: string
+          nullable: true
+          description: Identifier of the user who created the resource.
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the resource was deleted, if applicable.
+        displayName:
           type: string
           description: The display name of the resource.
-        links:
-          $ref: "#/components/schemas/Links"
+        externalId:
+          type: string
+          description: The external identifier of the resource.
+        externalUrl:
+          type: string
+          format: uri
+          description: External URL where the resource can be accessed.
+        name:
+          type: string
+          nullable: true
+          description: The name of the resource.
+        organizationId:
+          type: string
+          description: Identifier of the organization that owns the resource.
+        resourceType:
+          type: string
+          description: The type of the resource.
+        status:
+          type: string
+          description: Current status of the resource.
+        syncedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the resource was last synced.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the resource was last updated.
         properties:
           type: object
+          nullable: true
           description: Properties of the resource.
+        links:
+          $ref: "#/components/schemas/Links"
+          nullable: true
       required:
-        - type
-        - external_id
-        - display_name
+        - id
+        - displayName
+        - externalId
+      
 
     ResourceDefinition:
       type: object
@@ -654,16 +726,5 @@ components:
         - title
         - url
         - type
-
-    ResourceResponse:
-      allOf:
-        - $ref: "#/components/schemas/StandardResponse"
-        - type: object
-          properties:
-            data:
-              $ref: "#/components/schemas/Resource"
-          required:
-            - data
-
 security:
   - Token: []

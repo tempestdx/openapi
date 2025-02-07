@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/oapi-codegen/runtime"
@@ -73,16 +74,10 @@ const (
 	ReportResponseStatusOk    ReportResponseStatus = "ok"
 )
 
-// Defines values for ResourceResponseStatus.
-const (
-	ResourceResponseStatusError ResourceResponseStatus = "error"
-	ResourceResponseStatusOk    ResourceResponseStatus = "ok"
-)
-
 // Defines values for StandardResponseStatus.
 const (
-	StandardResponseStatusError StandardResponseStatus = "error"
-	StandardResponseStatusOk    StandardResponseStatus = "ok"
+	Error StandardResponseStatus = "error"
+	Ok    StandardResponseStatus = "ok"
 )
 
 // ActionDefinition defines model for ActionDefinition.
@@ -327,18 +322,48 @@ type ReportResponseStatus string
 
 // Resource defines model for Resource.
 type Resource struct {
+	// CreatedAt Timestamp when the resource was created.
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+
+	// CreatedBy Identifier of the user who created the resource.
+	CreatedBy *string `json:"createdBy"`
+
+	// DeletedAt Timestamp when the resource was deleted, if applicable.
+	DeletedAt *time.Time `json:"deletedAt"`
+
 	// DisplayName The display name of the resource.
-	DisplayName string `json:"display_name"`
+	DisplayName string `json:"displayName"`
 
 	// ExternalId The external identifier of the resource.
-	ExternalId string `json:"external_id"`
-	Links      *Links `json:"links,omitempty"`
+	ExternalId string `json:"externalId"`
+
+	// ExternalUrl External URL where the resource can be accessed.
+	ExternalUrl *string `json:"externalUrl,omitempty"`
+
+	// Id Internal identifier of the resource.
+	Id    string `json:"id"`
+	Links *Links `json:"links,omitempty"`
+
+	// Name The name of the resource.
+	Name *string `json:"name"`
+
+	// OrganizationId Identifier of the organization that owns the resource.
+	OrganizationId *string `json:"organizationId,omitempty"`
 
 	// Properties Properties of the resource.
-	Properties *map[string]interface{} `json:"properties,omitempty"`
+	Properties *map[string]interface{} `json:"properties"`
 
-	// Type The unique type of the resource.
-	Type string `json:"type"`
+	// ResourceType The type of the resource.
+	ResourceType *string `json:"resourceType,omitempty"`
+
+	// Status Current status of the resource.
+	Status *string `json:"status,omitempty"`
+
+	// SyncedAt Timestamp when the resource was last synced.
+	SyncedAt *time.Time `json:"syncedAt,omitempty"`
+
+	// UpdatedAt Timestamp when the resource was last updated.
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
 // ResourceDefinition defines model for ResourceDefinition.
@@ -389,24 +414,6 @@ type ResourceDefinition struct {
 	// UpdateSupported Whether the resource supports the update operation.
 	UpdateSupported bool `json:"update_supported"`
 }
-
-// ResourceResponse defines model for ResourceResponse.
-type ResourceResponse struct {
-	Data Resource `json:"data"`
-
-	// Error Error message if the operation fails.
-	Error *string `json:"error"`
-
-	// Message A message providing additional information.
-	Message  *string   `json:"message,omitempty"`
-	Metadata *Metadata `json:"metadata,omitempty"`
-
-	// Status Status of the report operation
-	Status ResourceResponseStatus `json:"status"`
-}
-
-// ResourceResponseStatus Status of the report operation
-type ResourceResponseStatus string
 
 // StandardResponse defines model for StandardResponse.
 type StandardResponse struct {
@@ -462,6 +469,9 @@ type PostAppsVersionsHealthJSONRequestBody = AppHealthReportRequest
 
 // GetResourcesJSONRequestBody defines body for GetResources for application/json ContentType.
 type GetResourcesJSONRequestBody = Resource
+
+// ResourceCollectionJSONRequestBody defines body for ResourceCollection for application/json ContentType.
+type ResourceCollectionJSONRequestBody = ListResourcesRequest
 
 // AsExecuteResourceOperationRequest returns the union data inside the NextResponse_Task as a ExecuteResourceOperationRequest
 func (t NextResponse_Task) AsExecuteResourceOperationRequest() (ExecuteResourceOperationRequest, error) {
@@ -798,6 +808,11 @@ type ClientInterface interface {
 	GetResourcesWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	GetResources(ctx context.Context, body GetResourcesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// ResourceCollectionWithBody request with any body
+	ResourceCollectionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	ResourceCollection(ctx context.Context, body ResourceCollectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) PostAppsOperationsNextWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -910,6 +925,30 @@ func (c *Client) GetResourcesWithBody(ctx context.Context, contentType string, b
 
 func (c *Client) GetResources(ctx context.Context, body GetResourcesJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewGetResourcesRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ResourceCollectionWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewResourceCollectionRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) ResourceCollection(ctx context.Context, body ResourceCollectionJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewResourceCollectionRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1120,6 +1159,46 @@ func NewGetResourcesRequestWithBody(server string, contentType string, body io.R
 	return req, nil
 }
 
+// NewResourceCollectionRequest calls the generic ResourceCollection builder with application/json body
+func NewResourceCollectionRequest(server string, body ResourceCollectionJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewResourceCollectionRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewResourceCollectionRequestWithBody generates requests for ResourceCollection with any type of body
+func NewResourceCollectionRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/resources.list")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -1187,6 +1266,11 @@ type ClientWithResponsesInterface interface {
 	GetResourcesWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*GetResourcesResponse, error)
 
 	GetResourcesWithResponse(ctx context.Context, body GetResourcesJSONRequestBody, reqEditors ...RequestEditorFn) (*GetResourcesResponse, error)
+
+	// ResourceCollectionWithBodyWithResponse request with any body
+	ResourceCollectionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResourceCollectionResponse, error)
+
+	ResourceCollectionWithResponse(ctx context.Context, body ResourceCollectionJSONRequestBody, reqEditors ...RequestEditorFn) (*ResourceCollectionResponse, error)
 }
 
 type PostAppsOperationsNextResponse struct {
@@ -1289,7 +1373,7 @@ func (r PostAppsVersionsHealthResponse) StatusCode() int {
 type GetResourcesResponse struct {
 	Body         []byte
 	HTTPResponse *http.Response
-	JSON200      *ResourceResponse
+	JSON200      *Resource
 	JSON400      *ErrorResponse
 	JSON404      *ErrorResponse
 	JSON500      *ErrorResponse
@@ -1305,6 +1389,30 @@ func (r GetResourcesResponse) Status() string {
 
 // StatusCode returns HTTPResponse.StatusCode
 func (r GetResourcesResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type ResourceCollectionResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ListResourcesResponse
+	JSON400      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r ResourceCollectionResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r ResourceCollectionResponse) StatusCode() int {
 	if r.HTTPResponse != nil {
 		return r.HTTPResponse.StatusCode
 	}
@@ -1394,6 +1502,23 @@ func (c *ClientWithResponses) GetResourcesWithResponse(ctx context.Context, body
 		return nil, err
 	}
 	return ParseGetResourcesResponse(rsp)
+}
+
+// ResourceCollectionWithBodyWithResponse request with arbitrary body returning *ResourceCollectionResponse
+func (c *ClientWithResponses) ResourceCollectionWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*ResourceCollectionResponse, error) {
+	rsp, err := c.ResourceCollectionWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseResourceCollectionResponse(rsp)
+}
+
+func (c *ClientWithResponses) ResourceCollectionWithResponse(ctx context.Context, body ResourceCollectionJSONRequestBody, reqEditors ...RequestEditorFn) (*ResourceCollectionResponse, error) {
+	rsp, err := c.ResourceCollection(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParseResourceCollectionResponse(rsp)
 }
 
 // ParsePostAppsOperationsNextResponse parses an HTTP response from a PostAppsOperationsNextWithResponse call
@@ -1578,7 +1703,7 @@ func ParseGetResourcesResponse(rsp *http.Response) (*GetResourcesResponse, error
 
 	switch {
 	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
-		var dest ResourceResponse
+		var dest Resource
 		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
 			return nil, err
 		}
@@ -1610,6 +1735,46 @@ func ParseGetResourcesResponse(rsp *http.Response) (*GetResourcesResponse, error
 	return response, nil
 }
 
+// ParseResourceCollectionResponse parses an HTTP response from a ResourceCollectionWithResponse call
+func ParseResourceCollectionResponse(rsp *http.Response) (*ResourceCollectionResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &ResourceCollectionResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListResourcesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Retrieve the next task to execute
@@ -1627,6 +1792,9 @@ type ServerInterface interface {
 	// Get details of a resource
 	// (POST /resources.get)
 	GetResources(w http.ResponseWriter, r *http.Request)
+	// List resources of a specific type
+	// (POST /resources.list)
+	ResourceCollection(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -1660,6 +1828,12 @@ func (_ Unimplemented) PostAppsVersionsHealth(w http.ResponseWriter, r *http.Req
 // Get details of a resource
 // (POST /resources.get)
 func (_ Unimplemented) GetResources(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List resources of a specific type
+// (POST /resources.list)
+func (_ Unimplemented) ResourceCollection(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1763,6 +1937,26 @@ func (siw *ServerInterfaceWrapper) GetResources(w http.ResponseWriter, r *http.R
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.GetResources(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// ResourceCollection operation middleware
+func (siw *ServerInterfaceWrapper) ResourceCollection(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.ResourceCollection(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1899,6 +2093,9 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/resources.get", wrapper.GetResources)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/resources.list", wrapper.ResourceCollection)
 	})
 
 	return r
@@ -2069,7 +2266,7 @@ type GetResourcesResponseObject interface {
 	VisitGetResourcesResponse(w http.ResponseWriter) error
 }
 
-type GetResources200JSONResponse ResourceResponse
+type GetResources200JSONResponse Resource
 
 func (response GetResources200JSONResponse) VisitGetResourcesResponse(w http.ResponseWriter) error {
 	w.Header().Set("Content-Type", "application/json")
@@ -2105,6 +2302,41 @@ func (response GetResources500JSONResponse) VisitGetResourcesResponse(w http.Res
 	return json.NewEncoder(w).Encode(response)
 }
 
+type ResourceCollectionRequestObject struct {
+	Body *ResourceCollectionJSONRequestBody
+}
+
+type ResourceCollectionResponseObject interface {
+	VisitResourceCollectionResponse(w http.ResponseWriter) error
+}
+
+type ResourceCollection200JSONResponse ListResourcesResponse
+
+func (response ResourceCollection200JSONResponse) VisitResourceCollectionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ResourceCollection400JSONResponse ErrorResponse
+
+func (response ResourceCollection400JSONResponse) VisitResourceCollectionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type ResourceCollection500JSONResponse ErrorResponse
+
+func (response ResourceCollection500JSONResponse) VisitResourceCollectionResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// Retrieve the next task to execute
@@ -2122,6 +2354,9 @@ type StrictServerInterface interface {
 	// Get details of a resource
 	// (POST /resources.get)
 	GetResources(ctx context.Context, request GetResourcesRequestObject) (GetResourcesResponseObject, error)
+	// List resources of a specific type
+	// (POST /resources.list)
+	ResourceCollection(ctx context.Context, request ResourceCollectionRequestObject) (ResourceCollectionResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -2301,6 +2536,37 @@ func (sh *strictHandler) GetResources(w http.ResponseWriter, r *http.Request) {
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(GetResourcesResponseObject); ok {
 		if err := validResponse.VisitGetResourcesResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// ResourceCollection operation middleware
+func (sh *strictHandler) ResourceCollection(w http.ResponseWriter, r *http.Request) {
+	var request ResourceCollectionRequestObject
+
+	var body ResourceCollectionJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.ResourceCollection(ctx, request.(ResourceCollectionRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "ResourceCollection")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(ResourceCollectionResponseObject); ok {
+		if err := validResponse.VisitResourceCollectionResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {
