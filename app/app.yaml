@@ -223,6 +223,162 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /recipes.get:
+    post:
+      operationId: getRecipe
+      summary: Get details of a recipe
+      description: Retrieve detailed information about a specific recipe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: The unique identifier of the recipe.
+              required:
+                - id
+      responses:
+        "200":
+          description: Recipe details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recipes.list:
+    post:
+      operationId: recipeCollection
+      summary: List recipes
+      description: Retrieve a paginated list of recipes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                after:
+                  type: string
+                  description: Pagination cursor
+      responses:
+        "200":
+          description: Recipes retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListRecipesResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects.get:
+    post:
+      operationId: getProject
+      summary: Get details of a project
+      description: Retrieve detailed information about a specific project.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                  description: The unique identifier of the project.
+              required:
+                - id
+      responses:
+        "200":
+          description: Project details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects.list:
+    post:
+      operationId: projectCollection
+      summary: List projects
+      description: Retrieve a paginated list of projects.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                after:
+                  type: string
+                  description: Pagination cursor
+      responses:
+        "200":
+          description: Projects retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProjectsResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
 components:
   securitySchemes:
     Token:
@@ -726,5 +882,134 @@ components:
         - title
         - url
         - type
+
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Internal identifier of the recipe.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the recipe was created.
+        name:
+          type: string
+          description: The name of the recipe.
+        public:
+          type: boolean
+          description: Whether the recipe is public.
+        published:
+          type: boolean
+          description: Whether the recipe is published.
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the recipe was published.
+        teamId:
+          type: string
+          description: Team identifier the recipe belongs to.
+        type:
+          type: string
+          description: The type of the recipe.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the recipe was last updated.
+      required:
+        - id
+        - name
+        - teamId
+        - type
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Internal identifier of the project.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the project was created.
+        fromRecipe:
+          type: boolean
+          description: Whether the project was created from a recipe.
+        name:
+          type: string
+          description: The name of the project.
+        organizationId:
+          type: string
+          description: Organization identifier the project belongs to.
+        published:
+          type: boolean
+          description: Whether the project is published.
+        teamId:
+          type: string
+          description: Team identifier the project belongs to.
+        type:
+          type: string
+          description: The type of the project.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the project was last updated.
+      required:
+        - id
+        - name
+        - organizationId
+        - teamId
+        - type
+
+    ListRecipesResponse:
+      type: object
+      properties:
+        edges:
+          type: array
+          items:
+            type: object
+            properties:
+              node:
+                $ref: "#/components/schemas/Recipe"
+            required:
+              - node
+        pageInfo:
+          $ref: "#/components/schemas/PageInfo"
+      required:
+        - edges
+        - pageInfo
+
+    ListProjectsResponse:
+      type: object
+      properties:
+        edges:
+          type: array
+          items:
+            type: object
+            properties:
+              node:
+                $ref: "#/components/schemas/Project"
+            required:
+              - node
+        pageInfo:
+          $ref: "#/components/schemas/PageInfo"
+      required:
+        - edges
+        - pageInfo
+
+    PageInfo:
+      type: object
+      properties:
+        hasNextPage:
+          type: boolean
+          description: Indicates if there are more results after the current page.
+        endCursor:
+          type: string
+          nullable: true
+          description: Cursor to the last item in the current page.
+      required:
+        - hasNextPage
+
 security:
   - Token: []
