@@ -438,14 +438,14 @@ type Resource struct {
 	// Properties Properties of the resource.
 	Properties *map[string]interface{} `json:"properties"`
 
-	// ResourceType The type of the resource.
-	ResourceType *string `json:"resourceType,omitempty"`
-
 	// Status Current status of the resource.
 	Status *string `json:"status,omitempty"`
 
 	// SyncedAt Timestamp when the resource was last synced.
 	SyncedAt *time.Time `json:"syncedAt,omitempty"`
+
+	// Type The type of the resource.
+	Type *string `json:"type,omitempty"`
 
 	// UpdatedAt Timestamp when the resource was last updated.
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`

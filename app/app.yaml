@@ -706,7 +706,7 @@ components:
         organizationId:
           type: string
           description: Identifier of the organization that owns the resource.
-        resourceType:
+        type:
           type: string
           description: The type of the resource.
         status:
