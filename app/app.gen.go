@@ -329,8 +329,8 @@ type Project struct {
 	// CreatedAt Timestamp when the project was created.
 	CreatedAt *time.Time `json:"createdAt,omitempty"`
 
-	// FromRecipe Whether the project was created from a recipe.
-	FromRecipe *bool `json:"fromRecipe,omitempty"`
+	// FromRecipe ID of the recipe that was used to create the project.
+	FromRecipe *string `json:"fromRecipe,omitempty"`
 
 	// Id Internal identifier of the project.
 	Id string `json:"id"`

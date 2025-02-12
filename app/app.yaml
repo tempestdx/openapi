@@ -934,8 +934,8 @@ components:
           format: date-time
           description: Timestamp when the project was created.
         fromRecipe:
-          type: boolean
-          description: Whether the project was created from a recipe.
+          type: string
+          description: ID of the recipe that was used to create the project.
         name:
           type: string
           description: The name of the project.
