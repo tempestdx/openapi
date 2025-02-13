@@ -587,6 +587,7 @@ components:
           type: string
           description: The next page token for pagination.
       required:
+        - response_type
         - resources
 
     ExecuteResourceActionRequest:
