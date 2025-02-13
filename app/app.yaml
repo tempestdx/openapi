@@ -166,7 +166,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/Resource"
+              $ref: "#/components/schemas/RequestObjectById"
       responses:
         "200":
           description: Resource details retrieved successfully
@@ -233,13 +233,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: The unique identifier of the recipe.
-              required:
-                - id
+              $ref: "#/components/schemas/RequestObjectById"
       responses:
         "200":
           description: Recipe details retrieved successfully
@@ -276,11 +270,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                after:
-                  type: string
-                  description: Pagination cursor
+              $ref: "#/components/schemas/RequestPaginatedObjects"
       responses:
         "200":
           description: Recipes retrieved successfully
@@ -311,13 +301,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                id:
-                  type: string
-                  description: The unique identifier of the project.
-              required:
-                - id
+              $ref: "#/components/schemas/RequestObjectById"
       responses:
         "200":
           description: Project details retrieved successfully
@@ -354,11 +338,7 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                after:
-                  type: string
-                  description: Pagination cursor
+              $ref: "#/components/schemas/RequestPaginatedObjects"
       responses:
         "200":
           description: Projects retrieved successfully
@@ -600,16 +580,14 @@ components:
           description: The type of response.
         resources:
           type: array
+          description: List of resources for requested page
           items:
             $ref: "#/components/schemas/Resource"
-          description: The resources that were listed.
         next:
           type: string
           description: The next page token for pagination.
       required:
-        - response_type
         - resources
-        - next
 
     ExecuteResourceActionRequest:
       type: object
@@ -731,6 +709,7 @@ components:
         - id
         - displayName
         - externalId
+        - type
       
 
     ResourceDefinition:
@@ -965,38 +944,30 @@ components:
     ListRecipesResponse:
       type: object
       properties:
-        edges:
+        recipes:
           type: array
+          description: List of recipes for requested page
           items:
-            type: object
-            properties:
-              node:
-                $ref: "#/components/schemas/Recipe"
-            required:
-              - node
-        pageInfo:
-          $ref: "#/components/schemas/PageInfo"
+            $ref: "#/components/schemas/Recipe"
+        next:
+          type: string
+          description: The next page token for pagination.
       required:
-        - edges
-        - pageInfo
+        - recipes
 
     ListProjectsResponse:
       type: object
       properties:
-        edges:
+        projects:
           type: array
+          description: List of projects for requested page
           items:
-            type: object
-            properties:
-              node:
-                $ref: "#/components/schemas/Project"
-            required:
-              - node
-        pageInfo:
-          $ref: "#/components/schemas/PageInfo"
+            $ref: "#/components/schemas/Project"
+        next:
+          type: string
+          description: The next page token for pagination.
       required:
-        - edges
-        - pageInfo
+        - projects
 
     PageInfo:
       type: object
@@ -1010,6 +981,23 @@ components:
           description: Cursor to the last item in the current page.
       required:
         - hasNextPage
+
+    RequestObjectById:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the object.
+      required:
+        - id
+
+    RequestPaginatedObjects:
+      type: object
+      properties:
+        next:
+          type: string
+          description: Pagination cursor for the next page of results
+          nullable: true
 
 security:
   - Token: []

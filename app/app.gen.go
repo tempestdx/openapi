@@ -241,18 +241,20 @@ type LinksItemType string
 
 // ListProjectsResponse defines model for ListProjectsResponse.
 type ListProjectsResponse struct {
-	Edges []struct {
-		Node Project `json:"node"`
-	} `json:"edges"`
-	PageInfo PageInfo `json:"pageInfo"`
+	// Next The next page token for pagination.
+	Next *string `json:"next,omitempty"`
+
+	// Projects List of projects for requested page
+	Projects []Project `json:"projects"`
 }
 
 // ListRecipesResponse defines model for ListRecipesResponse.
 type ListRecipesResponse struct {
-	Edges []struct {
-		Node Recipe `json:"node"`
-	} `json:"edges"`
-	PageInfo PageInfo `json:"pageInfo"`
+	// Next The next page token for pagination.
+	Next *string `json:"next,omitempty"`
+
+	// Recipes List of recipes for requested page
+	Recipes []Recipe `json:"recipes"`
 }
 
 // ListResourcesRequest defines model for ListResourcesRequest.
@@ -271,13 +273,13 @@ type ListResourcesRequest struct {
 // ListResourcesResponse defines model for ListResourcesResponse.
 type ListResourcesResponse struct {
 	// Next The next page token for pagination.
-	Next string `json:"next"`
+	Next *string `json:"next,omitempty"`
 
-	// Resources The resources that were listed.
+	// Resources List of resources for requested page
 	Resources []Resource `json:"resources"`
 
 	// ResponseType The type of response.
-	ResponseType string `json:"response_type"`
+	ResponseType *string `json:"response_type,omitempty"`
 }
 
 // Metadata defines model for Metadata.
@@ -314,15 +316,6 @@ type Owner struct {
 
 // OwnerType The type of owner.
 type OwnerType string
-
-// PageInfo defines model for PageInfo.
-type PageInfo struct {
-	// EndCursor Cursor to the last item in the current page.
-	EndCursor *string `json:"endCursor"`
-
-	// HasNextPage Indicates if there are more results after the current page.
-	HasNextPage bool `json:"hasNextPage"`
-}
 
 // Project defines model for Project.
 type Project struct {
@@ -405,6 +398,18 @@ type ReportResponse_Response struct {
 // ReportResponseStatus Status of the report operation
 type ReportResponseStatus string
 
+// RequestObjectById defines model for RequestObjectById.
+type RequestObjectById struct {
+	// Id The unique identifier of the object.
+	Id string `json:"id"`
+}
+
+// RequestPaginatedObjects defines model for RequestPaginatedObjects.
+type RequestPaginatedObjects struct {
+	// Next Pagination cursor for the next page of results
+	Next *string `json:"next"`
+}
+
 // Resource defines model for Resource.
 type Resource struct {
 	// CreatedAt Timestamp when the resource was created.
@@ -445,7 +450,7 @@ type Resource struct {
 	SyncedAt *time.Time `json:"syncedAt,omitempty"`
 
 	// Type The type of the resource.
-	Type *string `json:"type,omitempty"`
+	Type string `json:"type"`
 
 	// UpdatedAt Timestamp when the resource was last updated.
 	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
@@ -540,30 +545,6 @@ type PostAppsVersionConnectJSONBody struct {
 	Version string `json:"version"`
 }
 
-// GetProjectJSONBody defines parameters for GetProject.
-type GetProjectJSONBody struct {
-	// Id The unique identifier of the project.
-	Id string `json:"id"`
-}
-
-// ProjectCollectionJSONBody defines parameters for ProjectCollection.
-type ProjectCollectionJSONBody struct {
-	// After Pagination cursor
-	After *string `json:"after,omitempty"`
-}
-
-// GetRecipeJSONBody defines parameters for GetRecipe.
-type GetRecipeJSONBody struct {
-	// Id The unique identifier of the recipe.
-	Id string `json:"id"`
-}
-
-// RecipeCollectionJSONBody defines parameters for RecipeCollection.
-type RecipeCollectionJSONBody struct {
-	// After Pagination cursor
-	After *string `json:"after,omitempty"`
-}
-
 // PostAppsOperationsNextJSONRequestBody defines body for PostAppsOperationsNext for application/json ContentType.
 type PostAppsOperationsNextJSONRequestBody = AppRequest
 
@@ -577,19 +558,19 @@ type PostAppsVersionConnectJSONRequestBody PostAppsVersionConnectJSONBody
 type PostAppsVersionsHealthJSONRequestBody = AppHealthReportRequest
 
 // GetProjectJSONRequestBody defines body for GetProject for application/json ContentType.
-type GetProjectJSONRequestBody GetProjectJSONBody
+type GetProjectJSONRequestBody = RequestObjectById
 
 // ProjectCollectionJSONRequestBody defines body for ProjectCollection for application/json ContentType.
-type ProjectCollectionJSONRequestBody ProjectCollectionJSONBody
+type ProjectCollectionJSONRequestBody = RequestPaginatedObjects
 
 // GetRecipeJSONRequestBody defines body for GetRecipe for application/json ContentType.
-type GetRecipeJSONRequestBody GetRecipeJSONBody
+type GetRecipeJSONRequestBody = RequestObjectById
 
 // RecipeCollectionJSONRequestBody defines body for RecipeCollection for application/json ContentType.
-type RecipeCollectionJSONRequestBody RecipeCollectionJSONBody
+type RecipeCollectionJSONRequestBody = RequestPaginatedObjects
 
 // GetResourcesJSONRequestBody defines body for GetResources for application/json ContentType.
-type GetResourcesJSONRequestBody = Resource
+type GetResourcesJSONRequestBody = RequestObjectById
 
 // ResourceCollectionJSONRequestBody defines body for ResourceCollection for application/json ContentType.
 type ResourceCollectionJSONRequestBody = ListResourcesRequest
