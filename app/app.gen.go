@@ -279,7 +279,7 @@ type ListResourcesResponse struct {
 	Resources []Resource `json:"resources"`
 
 	// ResponseType The type of response.
-	ResponseType *string `json:"response_type,omitempty"`
+	ResponseType string `json:"response_type"`
 }
 
 // Metadata defines model for Metadata.
