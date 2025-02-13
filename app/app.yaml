@@ -589,6 +589,7 @@ components:
       required:
         - response_type
         - resources
+        - next
 
     ExecuteResourceActionRequest:
       type: object
@@ -955,6 +956,7 @@ components:
           description: The next page token for pagination.
       required:
         - recipes
+        - next
 
     ListProjectsResponse:
       type: object
@@ -969,6 +971,7 @@ components:
           description: The next page token for pagination.
       required:
         - projects
+        - next
 
     PageInfo:
       type: object

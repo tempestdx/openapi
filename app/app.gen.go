@@ -242,7 +242,7 @@ type LinksItemType string
 // ListProjectsResponse defines model for ListProjectsResponse.
 type ListProjectsResponse struct {
 	// Next The next page token for pagination.
-	Next *string `json:"next,omitempty"`
+	Next string `json:"next"`
 
 	// Projects List of projects for requested page
 	Projects []Project `json:"projects"`
@@ -251,7 +251,7 @@ type ListProjectsResponse struct {
 // ListRecipesResponse defines model for ListRecipesResponse.
 type ListRecipesResponse struct {
 	// Next The next page token for pagination.
-	Next *string `json:"next,omitempty"`
+	Next string `json:"next"`
 
 	// Recipes List of recipes for requested page
 	Recipes []Recipe `json:"recipes"`
@@ -273,7 +273,7 @@ type ListResourcesRequest struct {
 // ListResourcesResponse defines model for ListResourcesResponse.
 type ListResourcesResponse struct {
 	// Next The next page token for pagination.
-	Next *string `json:"next,omitempty"`
+	Next string `json:"next"`
 
 	// Resources List of resources for requested page
 	Resources []Resource `json:"resources"`
