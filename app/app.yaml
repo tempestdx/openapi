@@ -901,7 +901,6 @@ components:
       required:
         - id
         - name
-        - teamId
         - type
 
     Project:
@@ -940,7 +939,6 @@ components:
         - id
         - name
         - organizationId
-        - teamId
         - type
 
     ListRecipesResponse:

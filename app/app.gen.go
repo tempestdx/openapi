@@ -338,7 +338,7 @@ type Project struct {
 	Published *bool `json:"published,omitempty"`
 
 	// TeamId Team identifier the project belongs to.
-	TeamId string `json:"teamId"`
+	TeamId *string `json:"teamId,omitempty"`
 
 	// Type The type of the project.
 	Type string `json:"type"`
@@ -368,7 +368,7 @@ type Recipe struct {
 	PublishedAt *time.Time `json:"publishedAt"`
 
 	// TeamId Team identifier the recipe belongs to.
-	TeamId string `json:"teamId"`
+	TeamId *string `json:"teamId,omitempty"`
 
 	// Type The type of the recipe.
 	Type string `json:"type"`
