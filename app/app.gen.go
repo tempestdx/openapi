@@ -573,7 +573,7 @@ type RecipeCollectionJSONRequestBody = RequestPaginatedObjects
 type GetResourcesJSONRequestBody = RequestObjectById
 
 // ResourceCollectionJSONRequestBody defines body for ResourceCollection for application/json ContentType.
-type ResourceCollectionJSONRequestBody = ListResourcesRequest
+type ResourceCollectionJSONRequestBody = RequestPaginatedObjects
 
 // AsExecuteResourceOperationRequest returns the union data inside the NextResponse_Task as a ExecuteResourceOperationRequest
 func (t NextResponse_Task) AsExecuteResourceOperationRequest() (ExecuteResourceOperationRequest, error) {

@@ -202,7 +202,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/ListResourcesRequest"
+              $ref: "#/components/schemas/RequestPaginatedObjects"
       responses:
         "200":
           description: Resources retrieved successfully
