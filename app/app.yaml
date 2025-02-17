@@ -970,19 +970,6 @@ components:
         - projects
         - next
 
-    PageInfo:
-      type: object
-      properties:
-        hasNextPage:
-          type: boolean
-          description: Indicates if there are more results after the current page.
-        endCursor:
-          type: string
-          nullable: true
-          description: Cursor to the last item in the current page.
-      required:
-        - hasNextPage
-
     RequestObjectById:
       type: object
       additionalProperties: false
