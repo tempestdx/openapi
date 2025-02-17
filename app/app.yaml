@@ -712,7 +712,6 @@ components:
         - displayName
         - externalId
         - type
-      
 
     ResourceDefinition:
       type: object
@@ -986,6 +985,7 @@ components:
 
     RequestObjectById:
       type: object
+      additionalProperties: false
       properties:
         id:
           type: string
@@ -995,6 +995,7 @@ components:
 
     RequestPaginatedObjects:
       type: object
+      additionalProperties: false
       properties:
         next:
           type: string
