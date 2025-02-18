@@ -1,3 +1,0 @@
-apis:
-  app/app.yaml:
-    alias: private-apps-api
