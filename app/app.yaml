@@ -158,7 +158,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /resources.get:
     post:
-      operationId: getResources
+      operationId: postResourcesGet
       summary: Get details of a resource
       description: Retrieve detailed information about a specific resource.
       requestBody:
@@ -194,7 +194,7 @@ paths:
                 $ref: "#/components/schemas/ErrorResponse"
   /resources.list:
     post:
-      operationId: resourceCollection
+      operationId: postResourcesList
       summary: List resources of a specific type
       description: Retrieve a list of resources filtered by type.
       requestBody:
@@ -225,7 +225,7 @@ paths:
 
   /recipes.get:
     post:
-      operationId: getRecipe
+      operationId: postRecipesGet
       summary: Get details of a recipe
       description: Retrieve detailed information about a specific recipe.
       requestBody:
@@ -262,7 +262,7 @@ paths:
 
   /recipes.list:
     post:
-      operationId: recipeCollection
+      operationId: postRecipesList
       summary: List recipes
       description: Retrieve a paginated list of recipes.
       requestBody:
@@ -293,7 +293,7 @@ paths:
 
   /projects.get:
     post:
-      operationId: getProject
+      operationId: postProjectsGet
       summary: Get details of a project
       description: Retrieve detailed information about a specific project.
       requestBody:
@@ -330,7 +330,7 @@ paths:
 
   /projects.list:
     post:
-      operationId: projectCollection
+      operationId: postProjectsList
       summary: List projects
       description: Retrieve a paginated list of projects.
       requestBody:
