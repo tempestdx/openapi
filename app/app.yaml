@@ -156,6 +156,208 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
+  /resources.get:
+    post:
+      operationId: postResourcesGet
+      summary: Get details of a resource
+      description: Retrieve detailed information about a specific resource.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestObjectById"
+      responses:
+        "200":
+          description: Resource details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Resource"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Resource not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+  /resources.list:
+    post:
+      operationId: postResourcesList
+      summary: List resources of a specific type
+      description: Retrieve a list of resources filtered by type.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPaginatedObjects"
+      responses:
+        "200":
+          description: Resources retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListResourcesResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recipes.get:
+    post:
+      operationId: postRecipesGet
+      summary: Get details of a recipe
+      description: Retrieve detailed information about a specific recipe.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestObjectById"
+      responses:
+        "200":
+          description: Recipe details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Recipe"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Recipe not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /recipes.list:
+    post:
+      operationId: postRecipesList
+      summary: List recipes
+      description: Retrieve a paginated list of recipes.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPaginatedObjects"
+      responses:
+        "200":
+          description: Recipes retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListRecipesResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects.get:
+    post:
+      operationId: postProjectsGet
+      summary: Get details of a project
+      description: Retrieve detailed information about a specific project.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestObjectById"
+      responses:
+        "200":
+          description: Project details retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Project"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Project not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /projects.list:
+    post:
+      operationId: postProjectsList
+      summary: List projects
+      description: Retrieve a paginated list of projects.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RequestPaginatedObjects"
+      responses:
+        "200":
+          description: Projects retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ListProjectsResponse"
+        "400":
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -378,9 +580,9 @@ components:
           description: The type of response.
         resources:
           type: array
+          description: List of resources for requested page
           items:
             $ref: "#/components/schemas/Resource"
-          description: The resources that were listed.
         next:
           type: string
           description: The next page token for pagination.
@@ -451,24 +653,65 @@ components:
     Resource:
       type: object
       properties:
-        type:
+        id:
           type: string
-          description: The unique type of the resource.
-        external_id:
+          description: Internal identifier of the resource.
+        createdAt:
           type: string
-          description: The external identifier of the resource.
-        display_name:
+          format: date-time
+          description: Timestamp when the resource was created.
+        createdBy:
+          type: string
+          nullable: true
+          description: Identifier of the user who created the resource.
+        deletedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the resource was deleted, if applicable.
+        displayName:
           type: string
           description: The display name of the resource.
-        links:
-          $ref: "#/components/schemas/Links"
+        externalId:
+          type: string
+          description: The external identifier of the resource.
+        externalUrl:
+          type: string
+          format: uri
+          description: External URL where the resource can be accessed.
+        name:
+          type: string
+          nullable: true
+          description: The name of the resource.
+        organizationId:
+          type: string
+          description: Identifier of the organization that owns the resource.
+        type:
+          type: string
+          description: The type of the resource.
+        status:
+          type: string
+          description: Current status of the resource.
+        syncedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the resource was last synced.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the resource was last updated.
         properties:
           type: object
+          nullable: true
           description: Properties of the resource.
+        links:
+          $ref: "#/components/schemas/Links"
+          nullable: true
       required:
+        - id
+        - displayName
+        - externalId
         - type
-        - external_id
-        - display_name
 
     ResourceDefinition:
       type: object
@@ -619,5 +862,132 @@ components:
         - title
         - url
         - type
+
+    Recipe:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Internal identifier of the recipe.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the recipe was created.
+        name:
+          type: string
+          description: The name of the recipe.
+        public:
+          type: boolean
+          description: Whether the recipe is public.
+        published:
+          type: boolean
+          description: Whether the recipe is published.
+        publishedAt:
+          type: string
+          format: date-time
+          nullable: true
+          description: Timestamp when the recipe was published.
+        teamId:
+          type: string
+          description: Team identifier the recipe belongs to.
+        type:
+          type: string
+          description: The type of the recipe.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the recipe was last updated.
+      required:
+        - id
+        - name
+        - type
+
+    Project:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Internal identifier of the project.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the project was created.
+        fromRecipe:
+          type: string
+          description: ID of the recipe that was used to create the project.
+        name:
+          type: string
+          description: The name of the project.
+        organizationId:
+          type: string
+          description: Organization identifier the project belongs to.
+        published:
+          type: boolean
+          description: Whether the project is published.
+        teamId:
+          type: string
+          description: Team identifier the project belongs to.
+        type:
+          type: string
+          description: The type of the project.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the project was last updated.
+      required:
+        - id
+        - name
+        - organizationId
+        - type
+
+    ListRecipesResponse:
+      type: object
+      properties:
+        recipes:
+          type: array
+          description: List of recipes for requested page
+          items:
+            $ref: "#/components/schemas/Recipe"
+        next:
+          type: string
+          description: The next page token for pagination.
+      required:
+        - recipes
+        - next
+
+    ListProjectsResponse:
+      type: object
+      properties:
+        projects:
+          type: array
+          description: List of projects for requested page
+          items:
+            $ref: "#/components/schemas/Project"
+        next:
+          type: string
+          description: The next page token for pagination.
+      required:
+        - projects
+        - next
+
+    RequestObjectById:
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: The unique identifier of the object.
+      required:
+        - id
+
+    RequestPaginatedObjects:
+      type: object
+      additionalProperties: false
+      properties:
+        next:
+          type: string
+          description: Pagination cursor for the next page of results
+          nullable: true
+
 security:
   - Token: []

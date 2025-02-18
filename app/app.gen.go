@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"net/url"
 	"strings"
+	"time"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/oapi-codegen/runtime"
@@ -238,6 +239,24 @@ type LinksItem struct {
 // LinksItemType The type of link.
 type LinksItemType string
 
+// ListProjectsResponse defines model for ListProjectsResponse.
+type ListProjectsResponse struct {
+	// Next The next page token for pagination.
+	Next string `json:"next"`
+
+	// Projects List of projects for requested page
+	Projects []Project `json:"projects"`
+}
+
+// ListRecipesResponse defines model for ListRecipesResponse.
+type ListRecipesResponse struct {
+	// Next The next page token for pagination.
+	Next string `json:"next"`
+
+	// Recipes List of recipes for requested page
+	Recipes []Recipe `json:"recipes"`
+}
+
 // ListResourcesRequest defines model for ListResourcesRequest.
 type ListResourcesRequest struct {
 	// Metadata Metadata associated with the resource operation.
@@ -256,7 +275,7 @@ type ListResourcesResponse struct {
 	// Next The next page token for pagination.
 	Next string `json:"next"`
 
-	// Resources The resources that were listed.
+	// Resources List of resources for requested page
 	Resources []Resource `json:"resources"`
 
 	// ResponseType The type of response.
@@ -298,6 +317,66 @@ type Owner struct {
 // OwnerType The type of owner.
 type OwnerType string
 
+// Project defines model for Project.
+type Project struct {
+	// CreatedAt Timestamp when the project was created.
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+
+	// FromRecipe ID of the recipe that was used to create the project.
+	FromRecipe *string `json:"fromRecipe,omitempty"`
+
+	// Id Internal identifier of the project.
+	Id string `json:"id"`
+
+	// Name The name of the project.
+	Name string `json:"name"`
+
+	// OrganizationId Organization identifier the project belongs to.
+	OrganizationId string `json:"organizationId"`
+
+	// Published Whether the project is published.
+	Published *bool `json:"published,omitempty"`
+
+	// TeamId Team identifier the project belongs to.
+	TeamId *string `json:"teamId,omitempty"`
+
+	// Type The type of the project.
+	Type string `json:"type"`
+
+	// UpdatedAt Timestamp when the project was last updated.
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+}
+
+// Recipe defines model for Recipe.
+type Recipe struct {
+	// CreatedAt Timestamp when the recipe was created.
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+
+	// Id Internal identifier of the recipe.
+	Id string `json:"id"`
+
+	// Name The name of the recipe.
+	Name string `json:"name"`
+
+	// Public Whether the recipe is public.
+	Public *bool `json:"public,omitempty"`
+
+	// Published Whether the recipe is published.
+	Published *bool `json:"published,omitempty"`
+
+	// PublishedAt Timestamp when the recipe was published.
+	PublishedAt *time.Time `json:"publishedAt"`
+
+	// TeamId Team identifier the recipe belongs to.
+	TeamId *string `json:"teamId,omitempty"`
+
+	// Type The type of the recipe.
+	Type string `json:"type"`
+
+	// UpdatedAt Timestamp when the recipe was last updated.
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+}
+
 // ReportResponse defines model for ReportResponse.
 type ReportResponse struct {
 	// Message A message providing additional information.
@@ -319,20 +398,62 @@ type ReportResponse_Response struct {
 // ReportResponseStatus Status of the report operation
 type ReportResponseStatus string
 
+// RequestObjectById defines model for RequestObjectById.
+type RequestObjectById struct {
+	// Id The unique identifier of the object.
+	Id string `json:"id"`
+}
+
+// RequestPaginatedObjects defines model for RequestPaginatedObjects.
+type RequestPaginatedObjects struct {
+	// Next Pagination cursor for the next page of results
+	Next *string `json:"next"`
+}
+
 // Resource defines model for Resource.
 type Resource struct {
+	// CreatedAt Timestamp when the resource was created.
+	CreatedAt *time.Time `json:"createdAt,omitempty"`
+
+	// CreatedBy Identifier of the user who created the resource.
+	CreatedBy *string `json:"createdBy"`
+
+	// DeletedAt Timestamp when the resource was deleted, if applicable.
+	DeletedAt *time.Time `json:"deletedAt"`
+
 	// DisplayName The display name of the resource.
-	DisplayName string `json:"display_name"`
+	DisplayName string `json:"displayName"`
 
 	// ExternalId The external identifier of the resource.
-	ExternalId string `json:"external_id"`
-	Links      *Links `json:"links,omitempty"`
+	ExternalId string `json:"externalId"`
+
+	// ExternalUrl External URL where the resource can be accessed.
+	ExternalUrl *string `json:"externalUrl,omitempty"`
+
+	// Id Internal identifier of the resource.
+	Id    string `json:"id"`
+	Links *Links `json:"links,omitempty"`
+
+	// Name The name of the resource.
+	Name *string `json:"name"`
+
+	// OrganizationId Identifier of the organization that owns the resource.
+	OrganizationId *string `json:"organizationId,omitempty"`
 
 	// Properties Properties of the resource.
-	Properties *map[string]interface{} `json:"properties,omitempty"`
+	Properties *map[string]interface{} `json:"properties"`
 
-	// Type The unique type of the resource.
+	// Status Current status of the resource.
+	Status *string `json:"status,omitempty"`
+
+	// SyncedAt Timestamp when the resource was last synced.
+	SyncedAt *time.Time `json:"syncedAt,omitempty"`
+
+	// Type The type of the resource.
 	Type string `json:"type"`
+
+	// UpdatedAt Timestamp when the resource was last updated.
+	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
 }
 
 // ResourceDefinition defines model for ResourceDefinition.
@@ -435,6 +556,24 @@ type PostAppsVersionConnectJSONRequestBody PostAppsVersionConnectJSONBody
 
 // PostAppsVersionsHealthJSONRequestBody defines body for PostAppsVersionsHealth for application/json ContentType.
 type PostAppsVersionsHealthJSONRequestBody = AppHealthReportRequest
+
+// PostProjectsGetJSONRequestBody defines body for PostProjectsGet for application/json ContentType.
+type PostProjectsGetJSONRequestBody = RequestObjectById
+
+// PostProjectsListJSONRequestBody defines body for PostProjectsList for application/json ContentType.
+type PostProjectsListJSONRequestBody = RequestPaginatedObjects
+
+// PostRecipesGetJSONRequestBody defines body for PostRecipesGet for application/json ContentType.
+type PostRecipesGetJSONRequestBody = RequestObjectById
+
+// PostRecipesListJSONRequestBody defines body for PostRecipesList for application/json ContentType.
+type PostRecipesListJSONRequestBody = RequestPaginatedObjects
+
+// PostResourcesGetJSONRequestBody defines body for PostResourcesGet for application/json ContentType.
+type PostResourcesGetJSONRequestBody = RequestObjectById
+
+// PostResourcesListJSONRequestBody defines body for PostResourcesList for application/json ContentType.
+type PostResourcesListJSONRequestBody = RequestPaginatedObjects
 
 // AsExecuteResourceOperationRequest returns the union data inside the NextResponse_Task as a ExecuteResourceOperationRequest
 func (t NextResponse_Task) AsExecuteResourceOperationRequest() (ExecuteResourceOperationRequest, error) {
@@ -766,6 +905,36 @@ type ClientInterface interface {
 	PostAppsVersionsHealthWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
 
 	PostAppsVersionsHealth(ctx context.Context, body PostAppsVersionsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostProjectsGetWithBody request with any body
+	PostProjectsGetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostProjectsGet(ctx context.Context, body PostProjectsGetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostProjectsListWithBody request with any body
+	PostProjectsListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostProjectsList(ctx context.Context, body PostProjectsListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostRecipesGetWithBody request with any body
+	PostRecipesGetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostRecipesGet(ctx context.Context, body PostRecipesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostRecipesListWithBody request with any body
+	PostRecipesListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostRecipesList(ctx context.Context, body PostRecipesListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostResourcesGetWithBody request with any body
+	PostResourcesGetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostResourcesGet(ctx context.Context, body PostResourcesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	// PostResourcesListWithBody request with any body
+	PostResourcesListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error)
+
+	PostResourcesList(ctx context.Context, body PostResourcesListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error)
 }
 
 func (c *Client) PostAppsOperationsNextWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
@@ -854,6 +1023,150 @@ func (c *Client) PostAppsVersionsHealthWithBody(ctx context.Context, contentType
 
 func (c *Client) PostAppsVersionsHealth(ctx context.Context, body PostAppsVersionsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
 	req, err := NewPostAppsVersionsHealthRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostProjectsGetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostProjectsGetRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostProjectsGet(ctx context.Context, body PostProjectsGetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostProjectsGetRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostProjectsListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostProjectsListRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostProjectsList(ctx context.Context, body PostProjectsListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostProjectsListRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostRecipesGetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostRecipesGetRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostRecipesGet(ctx context.Context, body PostRecipesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostRecipesGetRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostRecipesListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostRecipesListRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostRecipesList(ctx context.Context, body PostRecipesListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostRecipesListRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResourcesGetWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResourcesGetRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResourcesGet(ctx context.Context, body PostResourcesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResourcesGetRequest(c.Server, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResourcesListWithBody(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResourcesListRequestWithBody(c.Server, contentType, body)
+	if err != nil {
+		return nil, err
+	}
+	req = req.WithContext(ctx)
+	if err := c.applyEditors(ctx, req, reqEditors); err != nil {
+		return nil, err
+	}
+	return c.Client.Do(req)
+}
+
+func (c *Client) PostResourcesList(ctx context.Context, body PostResourcesListJSONRequestBody, reqEditors ...RequestEditorFn) (*http.Response, error) {
+	req, err := NewPostResourcesListRequest(c.Server, body)
 	if err != nil {
 		return nil, err
 	}
@@ -1024,6 +1337,246 @@ func NewPostAppsVersionsHealthRequestWithBody(server string, contentType string,
 	return req, nil
 }
 
+// NewPostProjectsGetRequest calls the generic PostProjectsGet builder with application/json body
+func NewPostProjectsGetRequest(server string, body PostProjectsGetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostProjectsGetRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostProjectsGetRequestWithBody generates requests for PostProjectsGet with any type of body
+func NewPostProjectsGetRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/projects.get")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostProjectsListRequest calls the generic PostProjectsList builder with application/json body
+func NewPostProjectsListRequest(server string, body PostProjectsListJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostProjectsListRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostProjectsListRequestWithBody generates requests for PostProjectsList with any type of body
+func NewPostProjectsListRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/projects.list")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostRecipesGetRequest calls the generic PostRecipesGet builder with application/json body
+func NewPostRecipesGetRequest(server string, body PostRecipesGetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostRecipesGetRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostRecipesGetRequestWithBody generates requests for PostRecipesGet with any type of body
+func NewPostRecipesGetRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/recipes.get")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostRecipesListRequest calls the generic PostRecipesList builder with application/json body
+func NewPostRecipesListRequest(server string, body PostRecipesListJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostRecipesListRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostRecipesListRequestWithBody generates requests for PostRecipesList with any type of body
+func NewPostRecipesListRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/recipes.list")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostResourcesGetRequest calls the generic PostResourcesGet builder with application/json body
+func NewPostResourcesGetRequest(server string, body PostResourcesGetJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostResourcesGetRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostResourcesGetRequestWithBody generates requests for PostResourcesGet with any type of body
+func NewPostResourcesGetRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/resources.get")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
+// NewPostResourcesListRequest calls the generic PostResourcesList builder with application/json body
+func NewPostResourcesListRequest(server string, body PostResourcesListJSONRequestBody) (*http.Request, error) {
+	var bodyReader io.Reader
+	buf, err := json.Marshal(body)
+	if err != nil {
+		return nil, err
+	}
+	bodyReader = bytes.NewReader(buf)
+	return NewPostResourcesListRequestWithBody(server, "application/json", bodyReader)
+}
+
+// NewPostResourcesListRequestWithBody generates requests for PostResourcesList with any type of body
+func NewPostResourcesListRequestWithBody(server string, contentType string, body io.Reader) (*http.Request, error) {
+	var err error
+
+	serverURL, err := url.Parse(server)
+	if err != nil {
+		return nil, err
+	}
+
+	operationPath := fmt.Sprintf("/resources.list")
+	if operationPath[0] == '/' {
+		operationPath = "." + operationPath
+	}
+
+	queryURL, err := serverURL.Parse(operationPath)
+	if err != nil {
+		return nil, err
+	}
+
+	req, err := http.NewRequest("POST", queryURL.String(), body)
+	if err != nil {
+		return nil, err
+	}
+
+	req.Header.Add("Content-Type", contentType)
+
+	return req, nil
+}
+
 func (c *Client) applyEditors(ctx context.Context, req *http.Request, additionalEditors []RequestEditorFn) error {
 	for _, r := range c.RequestEditors {
 		if err := r(ctx, req); err != nil {
@@ -1086,6 +1639,36 @@ type ClientWithResponsesInterface interface {
 	PostAppsVersionsHealthWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostAppsVersionsHealthResponse, error)
 
 	PostAppsVersionsHealthWithResponse(ctx context.Context, body PostAppsVersionsHealthJSONRequestBody, reqEditors ...RequestEditorFn) (*PostAppsVersionsHealthResponse, error)
+
+	// PostProjectsGetWithBodyWithResponse request with any body
+	PostProjectsGetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostProjectsGetResponse, error)
+
+	PostProjectsGetWithResponse(ctx context.Context, body PostProjectsGetJSONRequestBody, reqEditors ...RequestEditorFn) (*PostProjectsGetResponse, error)
+
+	// PostProjectsListWithBodyWithResponse request with any body
+	PostProjectsListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostProjectsListResponse, error)
+
+	PostProjectsListWithResponse(ctx context.Context, body PostProjectsListJSONRequestBody, reqEditors ...RequestEditorFn) (*PostProjectsListResponse, error)
+
+	// PostRecipesGetWithBodyWithResponse request with any body
+	PostRecipesGetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRecipesGetResponse, error)
+
+	PostRecipesGetWithResponse(ctx context.Context, body PostRecipesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRecipesGetResponse, error)
+
+	// PostRecipesListWithBodyWithResponse request with any body
+	PostRecipesListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRecipesListResponse, error)
+
+	PostRecipesListWithResponse(ctx context.Context, body PostRecipesListJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRecipesListResponse, error)
+
+	// PostResourcesGetWithBodyWithResponse request with any body
+	PostResourcesGetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResourcesGetResponse, error)
+
+	PostResourcesGetWithResponse(ctx context.Context, body PostResourcesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResourcesGetResponse, error)
+
+	// PostResourcesListWithBodyWithResponse request with any body
+	PostResourcesListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResourcesListResponse, error)
+
+	PostResourcesListWithResponse(ctx context.Context, body PostResourcesListJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResourcesListResponse, error)
 }
 
 type PostAppsOperationsNextResponse struct {
@@ -1185,6 +1768,153 @@ func (r PostAppsVersionsHealthResponse) StatusCode() int {
 	return 0
 }
 
+type PostProjectsGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Project
+	JSON400      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostProjectsGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostProjectsGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostProjectsListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ListProjectsResponse
+	JSON400      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostProjectsListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostProjectsListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostRecipesGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Recipe
+	JSON400      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostRecipesGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostRecipesGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostRecipesListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ListRecipesResponse
+	JSON400      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostRecipesListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostRecipesListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostResourcesGetResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *Resource
+	JSON400      *ErrorResponse
+	JSON404      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostResourcesGetResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostResourcesGetResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
+type PostResourcesListResponse struct {
+	Body         []byte
+	HTTPResponse *http.Response
+	JSON200      *ListResourcesResponse
+	JSON400      *ErrorResponse
+	JSON500      *ErrorResponse
+}
+
+// Status returns HTTPResponse.Status
+func (r PostResourcesListResponse) Status() string {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.Status
+	}
+	return http.StatusText(0)
+}
+
+// StatusCode returns HTTPResponse.StatusCode
+func (r PostResourcesListResponse) StatusCode() int {
+	if r.HTTPResponse != nil {
+		return r.HTTPResponse.StatusCode
+	}
+	return 0
+}
+
 // PostAppsOperationsNextWithBodyWithResponse request with arbitrary body returning *PostAppsOperationsNextResponse
 func (c *ClientWithResponses) PostAppsOperationsNextWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostAppsOperationsNextResponse, error) {
 	rsp, err := c.PostAppsOperationsNextWithBody(ctx, contentType, body, reqEditors...)
@@ -1251,6 +1981,108 @@ func (c *ClientWithResponses) PostAppsVersionsHealthWithResponse(ctx context.Con
 		return nil, err
 	}
 	return ParsePostAppsVersionsHealthResponse(rsp)
+}
+
+// PostProjectsGetWithBodyWithResponse request with arbitrary body returning *PostProjectsGetResponse
+func (c *ClientWithResponses) PostProjectsGetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostProjectsGetResponse, error) {
+	rsp, err := c.PostProjectsGetWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostProjectsGetResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostProjectsGetWithResponse(ctx context.Context, body PostProjectsGetJSONRequestBody, reqEditors ...RequestEditorFn) (*PostProjectsGetResponse, error) {
+	rsp, err := c.PostProjectsGet(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostProjectsGetResponse(rsp)
+}
+
+// PostProjectsListWithBodyWithResponse request with arbitrary body returning *PostProjectsListResponse
+func (c *ClientWithResponses) PostProjectsListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostProjectsListResponse, error) {
+	rsp, err := c.PostProjectsListWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostProjectsListResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostProjectsListWithResponse(ctx context.Context, body PostProjectsListJSONRequestBody, reqEditors ...RequestEditorFn) (*PostProjectsListResponse, error) {
+	rsp, err := c.PostProjectsList(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostProjectsListResponse(rsp)
+}
+
+// PostRecipesGetWithBodyWithResponse request with arbitrary body returning *PostRecipesGetResponse
+func (c *ClientWithResponses) PostRecipesGetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRecipesGetResponse, error) {
+	rsp, err := c.PostRecipesGetWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostRecipesGetResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostRecipesGetWithResponse(ctx context.Context, body PostRecipesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRecipesGetResponse, error) {
+	rsp, err := c.PostRecipesGet(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostRecipesGetResponse(rsp)
+}
+
+// PostRecipesListWithBodyWithResponse request with arbitrary body returning *PostRecipesListResponse
+func (c *ClientWithResponses) PostRecipesListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostRecipesListResponse, error) {
+	rsp, err := c.PostRecipesListWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostRecipesListResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostRecipesListWithResponse(ctx context.Context, body PostRecipesListJSONRequestBody, reqEditors ...RequestEditorFn) (*PostRecipesListResponse, error) {
+	rsp, err := c.PostRecipesList(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostRecipesListResponse(rsp)
+}
+
+// PostResourcesGetWithBodyWithResponse request with arbitrary body returning *PostResourcesGetResponse
+func (c *ClientWithResponses) PostResourcesGetWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResourcesGetResponse, error) {
+	rsp, err := c.PostResourcesGetWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResourcesGetResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostResourcesGetWithResponse(ctx context.Context, body PostResourcesGetJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResourcesGetResponse, error) {
+	rsp, err := c.PostResourcesGet(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResourcesGetResponse(rsp)
+}
+
+// PostResourcesListWithBodyWithResponse request with arbitrary body returning *PostResourcesListResponse
+func (c *ClientWithResponses) PostResourcesListWithBodyWithResponse(ctx context.Context, contentType string, body io.Reader, reqEditors ...RequestEditorFn) (*PostResourcesListResponse, error) {
+	rsp, err := c.PostResourcesListWithBody(ctx, contentType, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResourcesListResponse(rsp)
+}
+
+func (c *ClientWithResponses) PostResourcesListWithResponse(ctx context.Context, body PostResourcesListJSONRequestBody, reqEditors ...RequestEditorFn) (*PostResourcesListResponse, error) {
+	rsp, err := c.PostResourcesList(ctx, body, reqEditors...)
+	if err != nil {
+		return nil, err
+	}
+	return ParsePostResourcesListResponse(rsp)
 }
 
 // ParsePostAppsOperationsNextResponse parses an HTTP response from a PostAppsOperationsNextWithResponse call
@@ -1420,6 +2252,267 @@ func ParsePostAppsVersionsHealthResponse(rsp *http.Response) (*PostAppsVersionsH
 	return response, nil
 }
 
+// ParsePostProjectsGetResponse parses an HTTP response from a PostProjectsGetWithResponse call
+func ParsePostProjectsGetResponse(rsp *http.Response) (*PostProjectsGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostProjectsGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Project
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostProjectsListResponse parses an HTTP response from a PostProjectsListWithResponse call
+func ParsePostProjectsListResponse(rsp *http.Response) (*PostProjectsListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostProjectsListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListProjectsResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostRecipesGetResponse parses an HTTP response from a PostRecipesGetWithResponse call
+func ParsePostRecipesGetResponse(rsp *http.Response) (*PostRecipesGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostRecipesGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Recipe
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostRecipesListResponse parses an HTTP response from a PostRecipesListWithResponse call
+func ParsePostRecipesListResponse(rsp *http.Response) (*PostRecipesListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostRecipesListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListRecipesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostResourcesGetResponse parses an HTTP response from a PostResourcesGetWithResponse call
+func ParsePostResourcesGetResponse(rsp *http.Response) (*PostResourcesGetResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostResourcesGetResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest Resource
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 404:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON404 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
+// ParsePostResourcesListResponse parses an HTTP response from a PostResourcesListWithResponse call
+func ParsePostResourcesListResponse(rsp *http.Response) (*PostResourcesListResponse, error) {
+	bodyBytes, err := io.ReadAll(rsp.Body)
+	defer func() { _ = rsp.Body.Close() }()
+	if err != nil {
+		return nil, err
+	}
+
+	response := &PostResourcesListResponse{
+		Body:         bodyBytes,
+		HTTPResponse: rsp,
+	}
+
+	switch {
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 200:
+		var dest ListResourcesResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON200 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 400:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON400 = &dest
+
+	case strings.Contains(rsp.Header.Get("Content-Type"), "json") && rsp.StatusCode == 500:
+		var dest ErrorResponse
+		if err := json.Unmarshal(bodyBytes, &dest); err != nil {
+			return nil, err
+		}
+		response.JSON500 = &dest
+
+	}
+
+	return response, nil
+}
+
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
 	// Retrieve the next task to execute
@@ -1434,6 +2527,24 @@ type ServerInterface interface {
 	// Handles health check reports for apps
 	// (POST /apps.versions.health)
 	PostAppsVersionsHealth(w http.ResponseWriter, r *http.Request)
+	// Get details of a project
+	// (POST /projects.get)
+	PostProjectsGet(w http.ResponseWriter, r *http.Request)
+	// List projects
+	// (POST /projects.list)
+	PostProjectsList(w http.ResponseWriter, r *http.Request)
+	// Get details of a recipe
+	// (POST /recipes.get)
+	PostRecipesGet(w http.ResponseWriter, r *http.Request)
+	// List recipes
+	// (POST /recipes.list)
+	PostRecipesList(w http.ResponseWriter, r *http.Request)
+	// Get details of a resource
+	// (POST /resources.get)
+	PostResourcesGet(w http.ResponseWriter, r *http.Request)
+	// List resources of a specific type
+	// (POST /resources.list)
+	PostResourcesList(w http.ResponseWriter, r *http.Request)
 }
 
 // Unimplemented server implementation that returns http.StatusNotImplemented for each endpoint.
@@ -1461,6 +2572,42 @@ func (_ Unimplemented) PostAppsVersionConnect(w http.ResponseWriter, r *http.Req
 // Handles health check reports for apps
 // (POST /apps.versions.health)
 func (_ Unimplemented) PostAppsVersionsHealth(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get details of a project
+// (POST /projects.get)
+func (_ Unimplemented) PostProjectsGet(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List projects
+// (POST /projects.list)
+func (_ Unimplemented) PostProjectsList(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get details of a recipe
+// (POST /recipes.get)
+func (_ Unimplemented) PostRecipesGet(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List recipes
+// (POST /recipes.list)
+func (_ Unimplemented) PostRecipesList(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// Get details of a resource
+// (POST /resources.get)
+func (_ Unimplemented) PostResourcesGet(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(http.StatusNotImplemented)
+}
+
+// List resources of a specific type
+// (POST /resources.list)
+func (_ Unimplemented) PostResourcesList(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
@@ -1544,6 +2691,126 @@ func (siw *ServerInterfaceWrapper) PostAppsVersionsHealth(w http.ResponseWriter,
 
 	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.PostAppsVersionsHealth(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostProjectsGet operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsGet(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostProjectsGet(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostProjectsList operation middleware
+func (siw *ServerInterfaceWrapper) PostProjectsList(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostProjectsList(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostRecipesGet operation middleware
+func (siw *ServerInterfaceWrapper) PostRecipesGet(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostRecipesGet(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostRecipesList operation middleware
+func (siw *ServerInterfaceWrapper) PostRecipesList(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostRecipesList(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostResourcesGet operation middleware
+func (siw *ServerInterfaceWrapper) PostResourcesGet(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostResourcesGet(w, r)
+	}))
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler.ServeHTTP(w, r)
+}
+
+// PostResourcesList operation middleware
+func (siw *ServerInterfaceWrapper) PostResourcesList(w http.ResponseWriter, r *http.Request) {
+
+	ctx := r.Context()
+
+	ctx = context.WithValue(ctx, TokenScopes, []string{})
+
+	r = r.WithContext(ctx)
+
+	handler := http.Handler(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.PostResourcesList(w, r)
 	}))
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -1677,6 +2944,24 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/apps.versions.health", wrapper.PostAppsVersionsHealth)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/projects.get", wrapper.PostProjectsGet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/projects.list", wrapper.PostProjectsList)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/recipes.get", wrapper.PostRecipesGet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/recipes.list", wrapper.PostRecipesList)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/resources.get", wrapper.PostResourcesGet)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/resources.list", wrapper.PostResourcesList)
 	})
 
 	return r
@@ -1839,6 +3124,243 @@ func (response PostAppsVersionsHealth500JSONResponse) VisitPostAppsVersionsHealt
 	return json.NewEncoder(w).Encode(response)
 }
 
+type PostProjectsGetRequestObject struct {
+	Body *PostProjectsGetJSONRequestBody
+}
+
+type PostProjectsGetResponseObject interface {
+	VisitPostProjectsGetResponse(w http.ResponseWriter) error
+}
+
+type PostProjectsGet200JSONResponse Project
+
+func (response PostProjectsGet200JSONResponse) VisitPostProjectsGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostProjectsGet400JSONResponse ErrorResponse
+
+func (response PostProjectsGet400JSONResponse) VisitPostProjectsGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostProjectsGet404JSONResponse ErrorResponse
+
+func (response PostProjectsGet404JSONResponse) VisitPostProjectsGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostProjectsGet500JSONResponse ErrorResponse
+
+func (response PostProjectsGet500JSONResponse) VisitPostProjectsGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostProjectsListRequestObject struct {
+	Body *PostProjectsListJSONRequestBody
+}
+
+type PostProjectsListResponseObject interface {
+	VisitPostProjectsListResponse(w http.ResponseWriter) error
+}
+
+type PostProjectsList200JSONResponse ListProjectsResponse
+
+func (response PostProjectsList200JSONResponse) VisitPostProjectsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostProjectsList400JSONResponse ErrorResponse
+
+func (response PostProjectsList400JSONResponse) VisitPostProjectsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostProjectsList500JSONResponse ErrorResponse
+
+func (response PostProjectsList500JSONResponse) VisitPostProjectsListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRecipesGetRequestObject struct {
+	Body *PostRecipesGetJSONRequestBody
+}
+
+type PostRecipesGetResponseObject interface {
+	VisitPostRecipesGetResponse(w http.ResponseWriter) error
+}
+
+type PostRecipesGet200JSONResponse Recipe
+
+func (response PostRecipesGet200JSONResponse) VisitPostRecipesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRecipesGet400JSONResponse ErrorResponse
+
+func (response PostRecipesGet400JSONResponse) VisitPostRecipesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRecipesGet404JSONResponse ErrorResponse
+
+func (response PostRecipesGet404JSONResponse) VisitPostRecipesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRecipesGet500JSONResponse ErrorResponse
+
+func (response PostRecipesGet500JSONResponse) VisitPostRecipesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRecipesListRequestObject struct {
+	Body *PostRecipesListJSONRequestBody
+}
+
+type PostRecipesListResponseObject interface {
+	VisitPostRecipesListResponse(w http.ResponseWriter) error
+}
+
+type PostRecipesList200JSONResponse ListRecipesResponse
+
+func (response PostRecipesList200JSONResponse) VisitPostRecipesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRecipesList400JSONResponse ErrorResponse
+
+func (response PostRecipesList400JSONResponse) VisitPostRecipesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostRecipesList500JSONResponse ErrorResponse
+
+func (response PostRecipesList500JSONResponse) VisitPostRecipesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostResourcesGetRequestObject struct {
+	Body *PostResourcesGetJSONRequestBody
+}
+
+type PostResourcesGetResponseObject interface {
+	VisitPostResourcesGetResponse(w http.ResponseWriter) error
+}
+
+type PostResourcesGet200JSONResponse Resource
+
+func (response PostResourcesGet200JSONResponse) VisitPostResourcesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostResourcesGet400JSONResponse ErrorResponse
+
+func (response PostResourcesGet400JSONResponse) VisitPostResourcesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostResourcesGet404JSONResponse ErrorResponse
+
+func (response PostResourcesGet404JSONResponse) VisitPostResourcesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(404)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostResourcesGet500JSONResponse ErrorResponse
+
+func (response PostResourcesGet500JSONResponse) VisitPostResourcesGetResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostResourcesListRequestObject struct {
+	Body *PostResourcesListJSONRequestBody
+}
+
+type PostResourcesListResponseObject interface {
+	VisitPostResourcesListResponse(w http.ResponseWriter) error
+}
+
+type PostResourcesList200JSONResponse ListResourcesResponse
+
+func (response PostResourcesList200JSONResponse) VisitPostResourcesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(200)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostResourcesList400JSONResponse ErrorResponse
+
+func (response PostResourcesList400JSONResponse) VisitPostResourcesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(400)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
+type PostResourcesList500JSONResponse ErrorResponse
+
+func (response PostResourcesList500JSONResponse) VisitPostResourcesListResponse(w http.ResponseWriter) error {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(500)
+
+	return json.NewEncoder(w).Encode(response)
+}
+
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
 	// Retrieve the next task to execute
@@ -1853,6 +3375,24 @@ type StrictServerInterface interface {
 	// Handles health check reports for apps
 	// (POST /apps.versions.health)
 	PostAppsVersionsHealth(ctx context.Context, request PostAppsVersionsHealthRequestObject) (PostAppsVersionsHealthResponseObject, error)
+	// Get details of a project
+	// (POST /projects.get)
+	PostProjectsGet(ctx context.Context, request PostProjectsGetRequestObject) (PostProjectsGetResponseObject, error)
+	// List projects
+	// (POST /projects.list)
+	PostProjectsList(ctx context.Context, request PostProjectsListRequestObject) (PostProjectsListResponseObject, error)
+	// Get details of a recipe
+	// (POST /recipes.get)
+	PostRecipesGet(ctx context.Context, request PostRecipesGetRequestObject) (PostRecipesGetResponseObject, error)
+	// List recipes
+	// (POST /recipes.list)
+	PostRecipesList(ctx context.Context, request PostRecipesListRequestObject) (PostRecipesListResponseObject, error)
+	// Get details of a resource
+	// (POST /resources.get)
+	PostResourcesGet(ctx context.Context, request PostResourcesGetRequestObject) (PostResourcesGetResponseObject, error)
+	// List resources of a specific type
+	// (POST /resources.list)
+	PostResourcesList(ctx context.Context, request PostResourcesListRequestObject) (PostResourcesListResponseObject, error)
 }
 
 type StrictHandlerFunc = strictnethttp.StrictHTTPHandlerFunc
@@ -2001,6 +3541,192 @@ func (sh *strictHandler) PostAppsVersionsHealth(w http.ResponseWriter, r *http.R
 		sh.options.ResponseErrorHandlerFunc(w, r, err)
 	} else if validResponse, ok := response.(PostAppsVersionsHealthResponseObject); ok {
 		if err := validResponse.VisitPostAppsVersionsHealthResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostProjectsGet operation middleware
+func (sh *strictHandler) PostProjectsGet(w http.ResponseWriter, r *http.Request) {
+	var request PostProjectsGetRequestObject
+
+	var body PostProjectsGetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostProjectsGet(ctx, request.(PostProjectsGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostProjectsGet")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostProjectsGetResponseObject); ok {
+		if err := validResponse.VisitPostProjectsGetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostProjectsList operation middleware
+func (sh *strictHandler) PostProjectsList(w http.ResponseWriter, r *http.Request) {
+	var request PostProjectsListRequestObject
+
+	var body PostProjectsListJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostProjectsList(ctx, request.(PostProjectsListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostProjectsList")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostProjectsListResponseObject); ok {
+		if err := validResponse.VisitPostProjectsListResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostRecipesGet operation middleware
+func (sh *strictHandler) PostRecipesGet(w http.ResponseWriter, r *http.Request) {
+	var request PostRecipesGetRequestObject
+
+	var body PostRecipesGetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostRecipesGet(ctx, request.(PostRecipesGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostRecipesGet")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostRecipesGetResponseObject); ok {
+		if err := validResponse.VisitPostRecipesGetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostRecipesList operation middleware
+func (sh *strictHandler) PostRecipesList(w http.ResponseWriter, r *http.Request) {
+	var request PostRecipesListRequestObject
+
+	var body PostRecipesListJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostRecipesList(ctx, request.(PostRecipesListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostRecipesList")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostRecipesListResponseObject); ok {
+		if err := validResponse.VisitPostRecipesListResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostResourcesGet operation middleware
+func (sh *strictHandler) PostResourcesGet(w http.ResponseWriter, r *http.Request) {
+	var request PostResourcesGetRequestObject
+
+	var body PostResourcesGetJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostResourcesGet(ctx, request.(PostResourcesGetRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostResourcesGet")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostResourcesGetResponseObject); ok {
+		if err := validResponse.VisitPostResourcesGetResponse(w); err != nil {
+			sh.options.ResponseErrorHandlerFunc(w, r, err)
+		}
+	} else if response != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, fmt.Errorf("unexpected response type: %T", response))
+	}
+}
+
+// PostResourcesList operation middleware
+func (sh *strictHandler) PostResourcesList(w http.ResponseWriter, r *http.Request) {
+	var request PostResourcesListRequestObject
+
+	var body PostResourcesListJSONRequestBody
+	if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+		sh.options.RequestErrorHandlerFunc(w, r, fmt.Errorf("can't decode JSON body: %w", err))
+		return
+	}
+	request.Body = &body
+
+	handler := func(ctx context.Context, w http.ResponseWriter, r *http.Request, request interface{}) (interface{}, error) {
+		return sh.ssi.PostResourcesList(ctx, request.(PostResourcesListRequestObject))
+	}
+	for _, middleware := range sh.middlewares {
+		handler = middleware(handler, "PostResourcesList")
+	}
+
+	response, err := handler(r.Context(), w, r, request)
+
+	if err != nil {
+		sh.options.ResponseErrorHandlerFunc(w, r, err)
+	} else if validResponse, ok := response.(PostResourcesListResponseObject); ok {
+		if err := validResponse.VisitPostResourcesListResponse(w); err != nil {
 			sh.options.ResponseErrorHandlerFunc(w, r, err)
 		}
 	} else if response != nil {

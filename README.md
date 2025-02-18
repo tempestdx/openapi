@@ -30,4 +30,4 @@ To share any requests, bugs or comments, please [open an issue][issues] or
 [issues]: https://github.com/tempestdx/openapi/issues/new
 [pulls]: https://github.com/tempestdx/openapi/pulls
 [tempest]: https://tempestdx.com/
-[openapi-docs]: https://docs.tempestdx.com/developer/api
+[openapi-docs]: https://docs.tempestdx.com/developer/api/overview
