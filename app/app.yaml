@@ -656,26 +656,26 @@ components:
         id:
           type: string
           description: Internal identifier of the resource.
-        createdAt:
+        created_at:
           type: string
           format: date-time
           description: Timestamp when the resource was created.
-        createdBy:
+        created_by:
           type: string
           nullable: true
           description: Identifier of the user who created the resource.
-        deletedAt:
+        deleted_at:
           type: string
           format: date-time
           nullable: true
           description: Timestamp when the resource was deleted, if applicable.
-        displayName:
+        display_name:
           type: string
           description: The display name of the resource.
-        externalId:
+        external_id:
           type: string
           description: The external identifier of the resource.
-        externalUrl:
+        external_url:
           type: string
           format: uri
           description: External URL where the resource can be accessed.
@@ -683,7 +683,7 @@ components:
           type: string
           nullable: true
           description: The name of the resource.
-        organizationId:
+        organization_id:
           type: string
           description: Identifier of the organization that owns the resource.
         type:
@@ -692,11 +692,11 @@ components:
         status:
           type: string
           description: Current status of the resource.
-        syncedAt:
+        synced_at:
           type: string
           format: date-time
           description: Timestamp when the resource was last synced.
-        updatedAt:
+        updated_at:
           type: string
           format: date-time
           description: Timestamp when the resource was last updated.
@@ -708,9 +708,8 @@ components:
           $ref: "#/components/schemas/Links"
           nullable: true
       required:
-        - id
-        - displayName
-        - externalId
+        - display_name
+        - external_id
         - type
 
     ResourceDefinition:
@@ -869,7 +868,7 @@ components:
         id:
           type: string
           description: Internal identifier of the recipe.
-        createdAt:
+        created_at:
           type: string
           format: date-time
           description: Timestamp when the recipe was created.
@@ -882,18 +881,18 @@ components:
         published:
           type: boolean
           description: Whether the recipe is published.
-        publishedAt:
+        published_at:
           type: string
           format: date-time
           nullable: true
           description: Timestamp when the recipe was published.
-        teamId:
+        team_id:
           type: string
           description: Team identifier the recipe belongs to.
         type:
           type: string
           description: The type of the recipe.
-        updatedAt:
+        updated_at:
           type: string
           format: date-time
           description: Timestamp when the recipe was last updated.
@@ -908,36 +907,36 @@ components:
         id:
           type: string
           description: Internal identifier of the project.
-        createdAt:
+        created_at:
           type: string
           format: date-time
           description: Timestamp when the project was created.
-        fromRecipe:
+        from_recipe:
           type: string
           description: ID of the recipe that was used to create the project.
         name:
           type: string
           description: The name of the project.
-        organizationId:
+        organization_id:
           type: string
           description: Organization identifier the project belongs to.
         published:
           type: boolean
           description: Whether the project is published.
-        teamId:
+        team_id:
           type: string
           description: Team identifier the project belongs to.
         type:
           type: string
           description: The type of the project.
-        updatedAt:
+        updated_at:
           type: string
           format: date-time
           description: Timestamp when the project was last updated.
       required:
         - id
         - name
-        - organizationId
+        - organization_id
         - type
 
     ListRecipesResponse:

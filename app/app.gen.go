@@ -320,10 +320,10 @@ type OwnerType string
 // Project defines model for Project.
 type Project struct {
 	// CreatedAt Timestamp when the project was created.
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 
 	// FromRecipe ID of the recipe that was used to create the project.
-	FromRecipe *string `json:"fromRecipe,omitempty"`
+	FromRecipe *string `json:"from_recipe,omitempty"`
 
 	// Id Internal identifier of the project.
 	Id string `json:"id"`
@@ -332,25 +332,25 @@ type Project struct {
 	Name string `json:"name"`
 
 	// OrganizationId Organization identifier the project belongs to.
-	OrganizationId string `json:"organizationId"`
+	OrganizationId string `json:"organization_id"`
 
 	// Published Whether the project is published.
 	Published *bool `json:"published,omitempty"`
 
 	// TeamId Team identifier the project belongs to.
-	TeamId *string `json:"teamId,omitempty"`
+	TeamId *string `json:"team_id,omitempty"`
 
 	// Type The type of the project.
 	Type string `json:"type"`
 
 	// UpdatedAt Timestamp when the project was last updated.
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 // Recipe defines model for Recipe.
 type Recipe struct {
 	// CreatedAt Timestamp when the recipe was created.
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 
 	// Id Internal identifier of the recipe.
 	Id string `json:"id"`
@@ -365,16 +365,16 @@ type Recipe struct {
 	Published *bool `json:"published,omitempty"`
 
 	// PublishedAt Timestamp when the recipe was published.
-	PublishedAt *time.Time `json:"publishedAt"`
+	PublishedAt *time.Time `json:"published_at"`
 
 	// TeamId Team identifier the recipe belongs to.
-	TeamId *string `json:"teamId,omitempty"`
+	TeamId *string `json:"team_id,omitempty"`
 
 	// Type The type of the recipe.
 	Type string `json:"type"`
 
 	// UpdatedAt Timestamp when the recipe was last updated.
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 // ReportResponse defines model for ReportResponse.
@@ -413,32 +413,32 @@ type RequestPaginatedObjects struct {
 // Resource defines model for Resource.
 type Resource struct {
 	// CreatedAt Timestamp when the resource was created.
-	CreatedAt *time.Time `json:"createdAt,omitempty"`
+	CreatedAt *time.Time `json:"created_at,omitempty"`
 
 	// CreatedBy Identifier of the user who created the resource.
-	CreatedBy *string `json:"createdBy"`
+	CreatedBy *string `json:"created_by"`
 
 	// DeletedAt Timestamp when the resource was deleted, if applicable.
-	DeletedAt *time.Time `json:"deletedAt"`
+	DeletedAt *time.Time `json:"deleted_at"`
 
 	// DisplayName The display name of the resource.
-	DisplayName string `json:"displayName"`
+	DisplayName string `json:"display_name"`
 
 	// ExternalId The external identifier of the resource.
-	ExternalId string `json:"externalId"`
+	ExternalId string `json:"external_id"`
 
 	// ExternalUrl External URL where the resource can be accessed.
-	ExternalUrl *string `json:"externalUrl,omitempty"`
+	ExternalUrl *string `json:"external_url,omitempty"`
 
 	// Id Internal identifier of the resource.
-	Id    string `json:"id"`
-	Links *Links `json:"links,omitempty"`
+	Id    *string `json:"id,omitempty"`
+	Links *Links  `json:"links,omitempty"`
 
 	// Name The name of the resource.
 	Name *string `json:"name"`
 
 	// OrganizationId Identifier of the organization that owns the resource.
-	OrganizationId *string `json:"organizationId,omitempty"`
+	OrganizationId *string `json:"organization_id,omitempty"`
 
 	// Properties Properties of the resource.
 	Properties *map[string]interface{} `json:"properties"`
@@ -447,13 +447,13 @@ type Resource struct {
 	Status *string `json:"status,omitempty"`
 
 	// SyncedAt Timestamp when the resource was last synced.
-	SyncedAt *time.Time `json:"syncedAt,omitempty"`
+	SyncedAt *time.Time `json:"synced_at,omitempty"`
 
 	// Type The type of the resource.
 	Type string `json:"type"`
 
 	// UpdatedAt Timestamp when the resource was last updated.
-	UpdatedAt *time.Time `json:"updatedAt,omitempty"`
+	UpdatedAt *time.Time `json:"updated_at,omitempty"`
 }
 
 // ResourceDefinition defines model for ResourceDefinition.
