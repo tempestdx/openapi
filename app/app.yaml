@@ -13,7 +13,7 @@ paths:
   /apps.operations.next:
     post:
       operationId: postAppsOperationsNext
-      summary: Retrieve the next task to execute
+      summary: Pull app operation
       description: Fetch the next available task for execution by an external client.
       requestBody:
         required: true
@@ -46,7 +46,7 @@ paths:
   /apps.operations.report:
     post:
       operationId: postAppsOperationsReport
-      summary: Report the result of a task execution
+      summary: Report execution result
       description: Clients report task completion or failure using this endpoint.
       requestBody:
         required: true
@@ -83,7 +83,7 @@ paths:
   /apps.version.connect:
     post:
       operationId: postAppsVersionConnect
-      summary: Connect to a specific app version
+      summary: Connect app version
       description: Establish a connection with a specific version of an app, defining the resource types.
       requestBody:
         required: true
@@ -129,7 +129,7 @@ paths:
   /apps.versions.health:
     post:
       operationId: postAppsVersionsHealth
-      summary: Handles health check reports for apps
+      summary: Report health status
       description: Clients report health check results using this endpoint.
       requestBody:
         required: true
