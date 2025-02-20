@@ -2515,16 +2515,16 @@ func ParsePostResourcesListResponse(rsp *http.Response) (*PostResourcesListRespo
 
 // ServerInterface represents all server handlers.
 type ServerInterface interface {
-	// Retrieve the next task to execute
+	// Pull app operation
 	// (POST /apps.operations.next)
 	PostAppsOperationsNext(w http.ResponseWriter, r *http.Request)
-	// Report the result of a task execution
+	// Report execution result
 	// (POST /apps.operations.report)
 	PostAppsOperationsReport(w http.ResponseWriter, r *http.Request)
-	// Connect to a specific app version
+	// Connect app version
 	// (POST /apps.version.connect)
 	PostAppsVersionConnect(w http.ResponseWriter, r *http.Request)
-	// Handles health check reports for apps
+	// Report health status
 	// (POST /apps.versions.health)
 	PostAppsVersionsHealth(w http.ResponseWriter, r *http.Request)
 	// Get details of a project
@@ -2551,25 +2551,25 @@ type ServerInterface interface {
 
 type Unimplemented struct{}
 
-// Retrieve the next task to execute
+// Pull app operation
 // (POST /apps.operations.next)
 func (_ Unimplemented) PostAppsOperationsNext(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Report the result of a task execution
+// Report execution result
 // (POST /apps.operations.report)
 func (_ Unimplemented) PostAppsOperationsReport(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Connect to a specific app version
+// Connect app version
 // (POST /apps.version.connect)
 func (_ Unimplemented) PostAppsVersionConnect(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
 }
 
-// Handles health check reports for apps
+// Report health status
 // (POST /apps.versions.health)
 func (_ Unimplemented) PostAppsVersionsHealth(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusNotImplemented)
@@ -3363,16 +3363,16 @@ func (response PostResourcesList500JSONResponse) VisitPostResourcesListResponse(
 
 // StrictServerInterface represents all server handlers.
 type StrictServerInterface interface {
-	// Retrieve the next task to execute
+	// Pull app operation
 	// (POST /apps.operations.next)
 	PostAppsOperationsNext(ctx context.Context, request PostAppsOperationsNextRequestObject) (PostAppsOperationsNextResponseObject, error)
-	// Report the result of a task execution
+	// Report execution result
 	// (POST /apps.operations.report)
 	PostAppsOperationsReport(ctx context.Context, request PostAppsOperationsReportRequestObject) (PostAppsOperationsReportResponseObject, error)
-	// Connect to a specific app version
+	// Connect app version
 	// (POST /apps.version.connect)
 	PostAppsVersionConnect(ctx context.Context, request PostAppsVersionConnectRequestObject) (PostAppsVersionConnectResponseObject, error)
-	// Handles health check reports for apps
+	// Report health status
 	// (POST /apps.versions.health)
 	PostAppsVersionsHealth(ctx context.Context, request PostAppsVersionsHealthRequestObject) (PostAppsVersionsHealthResponseObject, error)
 	// Get details of a project
