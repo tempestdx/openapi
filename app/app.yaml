@@ -550,7 +550,7 @@ components:
           description: The resource that was operated on.
       required:
         - response_type
-        - resources
+        - resource
 
     ListResourcesRequest:
       type: object

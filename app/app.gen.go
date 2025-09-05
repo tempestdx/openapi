@@ -213,7 +213,7 @@ type ExecuteResourceOperationRequestOperation string
 
 // ExecuteResourceOperationResponse defines model for ExecuteResourceOperationResponse.
 type ExecuteResourceOperationResponse struct {
-	Resource *Resource `json:"resource,omitempty"`
+	Resource Resource `json:"resource"`
 
 	// ResponseType The type of response.
 	ResponseType string `json:"response_type"`
